@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Gadget_Store.Application\Gadget_Store.Application.csproj" />
+    <ProjectReference Include="..\Gadget_Store.Domain\Gadget_Store.Domain.csproj" />
+    <ProjectReference Include="..\Gadget_Store.Patterns\Gadget_Store.Patterns.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Notifications\" />
+    <Folder Include="Persistence\" />
+    <Folder Include="Regional\EU\" />
+    <Folder Include="Regional\Asia\" />
+    <Folder Include="Regional\US\" />
+  </ItemGroup>
+
+</Project>
