@@ -16,8 +16,4 @@
     <ProjectReference Include="..\Gadget_Store.Patterns\Gadget_Store.Patterns.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DTOs\" />
-  </ItemGroup>
-
 </Project>

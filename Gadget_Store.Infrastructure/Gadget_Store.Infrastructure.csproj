@@ -15,9 +15,6 @@
   <ItemGroup>
     <Folder Include="Notifications\" />
     <Folder Include="Persistence\" />
-    <Folder Include="Regional\EU\" />
-    <Folder Include="Regional\Asia\" />
-    <Folder Include="Regional\US\" />
   </ItemGroup>
 
 </Project>
