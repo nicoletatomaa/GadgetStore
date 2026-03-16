@@ -14,22 +14,21 @@ public class OrderSummary
      public bool IsExpress { get; private set; }
      public string? Notes { get; private set; }
 
-     // Setat doar de Builder
-     internal void SetItems(List<OrderSummaryItem> items)
+     public void SetItems(List<OrderSummaryItem> items)
      {
           Items = items;
           Subtotal = items.Sum(i => i.LineTotal);
      }
 
-     internal void SetRegion(string region) => Region = region;
-     internal void SetPaymentMethod(string method) => PaymentMethod = method;
-     internal void SetDiscount(decimal discount) => DiscountAmount = discount;
-     internal void SetTax(decimal tax) => TaxAmount = tax;
-     internal void SetShipping(decimal shipping) => ShippingCost = shipping;
-     internal void SetExpress(bool isExpress) => IsExpress = isExpress;
-     internal void SetNotes(string? notes) => Notes = notes;
+     public void SetRegion(string region) => Region = region;
+     public void SetPaymentMethod(string method) => PaymentMethod = method;
+     public void SetDiscount(decimal discount) => DiscountAmount = discount;
+     public void SetTax(decimal tax) => TaxAmount = tax;
+     public void SetShipping(decimal shipping) => ShippingCost = shipping;
+     public void SetExpress(bool isExpress) => IsExpress = isExpress;
+     public void SetNotes(string? notes) => Notes = notes;
 
-     internal void CalculateGrandTotal()
+     public void CalculateGrandTotal()
      {
           GrandTotal = Subtotal - DiscountAmount + TaxAmount + ShippingCost;
      }

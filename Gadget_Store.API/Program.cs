@@ -1,8 +1,10 @@
-﻿using GadgetStore.Infrastructure.Payments;
+﻿using GadgetStore.Domain.Entities;
+using GadgetStore.Infrastructure.Payments;
 using GadgetStore.Infrastructure.Regional.Asia;
 using GadgetStore.Infrastructure.Regional.EU;
 using GadgetStore.Infrastructure.Regional.US;
 using GadgetStore.Patterns.Creational;
+using GadgetStore.Patterns.Creational.Prototype;
 using System.Text;
 
 Console.OutputEncoding = Encoding.UTF8;
@@ -23,6 +25,24 @@ builder.Services.AddSingleton<PaymentProvider>();
 builder.Services.AddKeyedSingleton<IRegionalFactory, EURegionalFactory>("EU");
 builder.Services.AddKeyedSingleton<IRegionalFactory, USRegionalFactory>("US");
 builder.Services.AddKeyedSingleton<IRegionalFactory, AsiaRegionalFactory>("Asia");
+
+// ── Prototype — Product Template Registry ─────────────────────
+var registry = new ProductTemplateRegistry();
+
+var iphone15Base = new ElectronicsProduct("iPhone 15 128GB", 1200m, 10, "Apple");
+iphone15Base.Tags.AddRange(new[] { "smartphone", "apple", "5G" });
+
+var airpodsBase = new AccessoryProduct("AirPods Pro", 200m, 15, "iPhone");
+airpodsBase.Tags.AddRange(new[] { "audio", "wireless", "apple" });
+
+var macbookBase = new ElectronicsProduct("MacBook Pro 14\"", 8500m, 5, "Apple");
+macbookBase.Tags.AddRange(new[] { "laptop", "apple", "M3" });
+
+registry.Register("iphone15-base", iphone15Base);
+registry.Register("airpods-base", airpodsBase);
+registry.Register("macbook-base", macbookBase);
+
+builder.Services.AddSingleton(registry);
 
 // ─────────────────────────────────────────────────────────────
 var app = builder.Build();
