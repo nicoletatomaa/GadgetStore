@@ -6,9 +6,10 @@ public class PaymentProvider
 {
      private readonly Dictionary<string, Func<PaymentProcessorFactory>> _creators = new()
      {
-          ["card"] = () => new CardPaymentFactory(),
-          ["paypal"] = () => new PayPalPaymentFactory(),
-          ["crypto"] = () => new CryptoPaymentFactory()
+         ["card"] = () => new CardPaymentFactory(),
+         ["paypal"] = () => new PayPalPaymentFactory(),
+         ["crypto"] = () => new CryptoPaymentFactory(),
+         ["stripe"] = () => new StripePaymentFactory()  
      };
 
      public PaymentProcessorFactory GetService(string type)
