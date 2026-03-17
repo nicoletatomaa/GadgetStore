@@ -6,6 +6,7 @@ using GadgetStore.Infrastructure.Regional.US;
 using GadgetStore.Patterns.Creational;
 using GadgetStore.Patterns.Creational.Prototype;
 using System.Text;
+using GadgetStore.Patterns.Structural.Composite;
 
 Console.OutputEncoding = Encoding.UTF8;
 
@@ -45,6 +46,29 @@ registry.Register("macbook-base", macbookBase);
 builder.Services.AddSingleton(registry);
 
 // ─────────────────────────────────────────────────────────────
+// ── Composite — Catalog ───────────────────────────────────────
+var rootCatalog = new CatalogCategory("GadgetStore Catalog");
+
+var electronics = new CatalogCategory("Electronics");
+var phones = new CatalogCategory("Phones");
+phones.Add(new CatalogProduct("iPhone 15 128GB", 1200m));
+phones.Add(new CatalogProduct("Samsung Galaxy S24", 950m));
+var laptops = new CatalogCategory("Laptops");
+laptops.Add(new CatalogProduct("MacBook Pro 14\"", 8500m));
+laptops.Add(new CatalogProduct("Dell XPS 15", 5200m));
+electronics.Add(phones);
+electronics.Add(laptops);
+
+var accessories = new CatalogCategory("Accessories");
+accessories.Add(new CatalogProduct("AirPods Pro", 200m));
+accessories.Add(new CatalogProduct("USB-C Hub", 85m));
+
+rootCatalog.Add(electronics);
+rootCatalog.Add(accessories);
+
+builder.Services.AddSingleton<ICatalogComponent>(rootCatalog);
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
