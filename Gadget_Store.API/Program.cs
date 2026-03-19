@@ -7,6 +7,8 @@ using GadgetStore.Patterns.Creational;
 using GadgetStore.Patterns.Creational.Prototype;
 using System.Text;
 using GadgetStore.Patterns.Structural.Composite;
+using GadgetStore.Infrastructure.Checkout;
+using GadgetStore.Patterns.Structural.Facade;
 
 Console.OutputEncoding = Encoding.UTF8;
 
@@ -65,6 +67,9 @@ accessories.Add(new CatalogProduct("USB-C Hub", 85m));
 
 rootCatalog.Add(electronics);
 rootCatalog.Add(accessories);
+
+// ── Façade — Checkout ─────────────────────────────────────────
+builder.Services.AddScoped<ICheckoutFacade, CheckoutFacade>();
 
 builder.Services.AddSingleton<ICatalogComponent>(rootCatalog);
 
