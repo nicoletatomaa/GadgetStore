@@ -1,4 +1,5 @@
 ﻿using GadgetStore.API.DTOs;
+using GadgetStore.Patterns.Behavioral.ChainOfResponsibility;
 using GadgetStore.Patterns.Behavioral.Strategy;
 using GadgetStore.Patterns.Structural.Facade;
 using Microsoft.AspNetCore.Mvc;
@@ -17,23 +18,44 @@ public class CheckoutController : ControllerBase
     }
 
     /// <summary>
-    /// Checkout cu discount dinamic selectat la runtime.
-    /// Pattern: Strategy — DiscountStrategyFactory alege algoritmul
-    /// corect fără if/else în controller.
+    /// Checkout cu validare în lanț (Chain of Responsibility) și discount dinamic (Strategy).
+    /// Cererea trece prin: EmptyCart → NegativePrice → MinimumOrder → Region.
+    /// Dacă oricare handler eșuează, comanda este respinsă cu motivul specific.
     /// </summary>
     [HttpPost]
     public IActionResult Checkout([FromBody] CheckoutRequest request)
     {
         try
         {
-            // ── Strategy ──────────────────────────────────────────────
+            // ── Chain of Responsibility — validare ────────────────────
+            var validationRequest = new OrderValidationRequest
+            {
+                Items = request.Items
+                    .Select(i => (i.ProductName, i.UnitPrice, i.Quantity))
+                    .ToList(),
+                Region = request.Region,
+                DiscountAmount = request.DiscountAmount
+            };
+
+            var chain = OrderValidationChain.Build();
+            var validation = chain.Handle(validationRequest, new OrderValidationResult());
+
+            if (!validation.IsValid)
+                return BadRequest(new
+                {
+                    message = "Validarea comenzii a eșuat.",
+                    errors = validation.Errors,
+                    passedValidators = validation.PassedHandlers
+                });
+
+            // ── Strategy — discount ───────────────────────────────────
             var discountStrategy = DiscountStrategyFactory.Create(
                 request.DiscountType, request.DiscountAmount);
 
             var subtotal = request.Items.Sum(i => i.UnitPrice * i.Quantity);
             var discountAmount = discountStrategy.ApplyDiscount(subtotal);
 
-            // ── Façade ────────────────────────────────────────────────
+            // ── Façade — procesează comanda ───────────────────────────
             var facadeRequest = new CheckoutFacadeRequest
             {
                 Items = request.Items
@@ -76,6 +98,10 @@ public class CheckoutController : ControllerBase
                     result.Payment.Success,
                     result.Payment.Message,
                     result.Payment.TransactionId
+                },
+                Validation = new
+                {
+                    PassedHandlers = validation.PassedHandlers
                 }
             });
         }
