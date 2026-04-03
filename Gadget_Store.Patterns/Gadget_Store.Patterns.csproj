@@ -11,8 +11,4 @@
     <ProjectReference Include="..\Gadget_Store.Domain\Gadget_Store.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Behavioral\" />
-  </ItemGroup>
-
 </Project>

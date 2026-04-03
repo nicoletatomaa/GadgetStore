@@ -1,4 +1,5 @@
 ﻿using GadgetStore.API.DTOs;
+using GadgetStore.Patterns.Behavioral.Strategy;
 using GadgetStore.Patterns.Structural.Facade;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,14 +17,23 @@ public class CheckoutController : ControllerBase
     }
 
     /// <summary>
-    /// Checkout complet într-un singur request.
-    /// Pattern: Façade — ascunde Abstract Factory + Builder + Factory Method.
+    /// Checkout cu discount dinamic selectat la runtime.
+    /// Pattern: Strategy — DiscountStrategyFactory alege algoritmul
+    /// corect fără if/else în controller.
     /// </summary>
     [HttpPost]
     public IActionResult Checkout([FromBody] CheckoutRequest request)
     {
         try
         {
+            // ── Strategy ──────────────────────────────────────────────
+            var discountStrategy = DiscountStrategyFactory.Create(
+                request.DiscountType, request.DiscountAmount);
+
+            var subtotal = request.Items.Sum(i => i.UnitPrice * i.Quantity);
+            var discountAmount = discountStrategy.ApplyDiscount(subtotal);
+
+            // ── Façade ────────────────────────────────────────────────
             var facadeRequest = new CheckoutFacadeRequest
             {
                 Items = request.Items
@@ -31,7 +41,7 @@ public class CheckoutController : ControllerBase
                     .ToList(),
                 Region = request.Region,
                 PaymentMethod = request.PaymentMethod,
-                DiscountAmount = request.DiscountAmount,
+                DiscountAmount = discountAmount,
                 Notes = request.Notes
             };
 
@@ -53,7 +63,11 @@ public class CheckoutController : ControllerBase
                     i.LineTotal
                 }),
                 result.Order.Subtotal,
-                result.Order.DiscountAmount,
+                Discount = new
+                {
+                    Strategy = discountStrategy.GetDescription(),
+                    Amount = discountAmount
+                },
                 result.Order.TaxAmount,
                 result.Order.ShippingCost,
                 result.Order.GrandTotal,
