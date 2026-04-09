@@ -73,6 +73,9 @@ builder.Services.AddScoped<ICheckoutFacade, CheckoutFacade>();
 
 builder.Services.AddSingleton<ICatalogComponent>(rootCatalog);
 
+// ── Command — Cart (Scoped: coș separat per sesiune HTTP) ─────
+builder.Services.AddScoped<GadgetStore.Patterns.Behavioral.Command.Cart>();
+builder.Services.AddScoped<GadgetStore.Patterns.Behavioral.Command.CartInvoker>();
 
 var app = builder.Build();
 
