@@ -4,19 +4,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GadgetStore.Infrastructure.Persistence.Repositories;
 
-public class ProductRepository : IProductRepository
+public class ProductRepository : BaseRepository<Product>, IProductRepository
 {
-    private readonly GadgetStoreDbContext _context;
+    public ProductRepository(GadgetStoreDbContext context) : base(context) { }
 
-    public ProductRepository(GadgetStoreDbContext context) => _context = context;
+    protected override DbSet<Product> GetSet() => Context.Products;
 
     public async Task<Product?> GetByIdAsync(Guid id) =>
-        await _context.Products
+        await Context.Products
             .Include(p => p.Category)
             .FirstOrDefaultAsync(p => p.Id == id && p.IsActive);
 
     public async Task<IEnumerable<Product>> GetAllAsync(int page = 1, int pageSize = 20) =>
-        await _context.Products
+        await Context.Products
             .Where(p => p.IsActive)
             .Include(p => p.Category)
             .OrderBy(p => p.Name)
@@ -25,7 +25,7 @@ public class ProductRepository : IProductRepository
             .ToListAsync();
 
     public async Task<IEnumerable<Product>> GetByCategoryAsync(int categoryId, int page = 1, int pageSize = 20) =>
-        await _context.Products
+        await Context.Products
             .Where(p => p.IsActive && p.CategoryId == categoryId)
             .Include(p => p.Category)
             .OrderBy(p => p.Name)
@@ -34,7 +34,7 @@ public class ProductRepository : IProductRepository
             .ToListAsync();
 
     public async Task<IEnumerable<Product>> SearchAsync(string query, int page = 1, int pageSize = 20) =>
-        await _context.Products
+        await Context.Products
             .Where(p => p.IsActive && (p.Name.Contains(query) || (p.Description != null && p.Description.Contains(query))))
             .Include(p => p.Category)
             .OrderBy(p => p.Name)
@@ -43,35 +43,23 @@ public class ProductRepository : IProductRepository
             .ToListAsync();
 
     public async Task<IEnumerable<Product>> GetTemplatesAsync() =>
-        await _context.Products
+        await Context.Products
             .Where(p => p.IsTemplate && p.IsActive)
             .ToListAsync();
 
     public async Task<int> CountAsync() =>
-        await _context.Products.CountAsync(p => p.IsActive);
-
-    public async Task AddAsync(Product product)
-    {
-        await _context.Products.AddAsync(product);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task UpdateAsync(Product product)
-    {
-        _context.Products.Update(product);
-        await _context.SaveChangesAsync();
-    }
+        await Context.Products.CountAsync(p => p.IsActive);
 
     public async Task DeleteAsync(Guid id)
     {
-        var product = await _context.Products.FindAsync(id);
+        var product = await Context.Products.FindAsync(id);
         if (product != null)
         {
             product.IsActive = false;
-            await _context.SaveChangesAsync();
+            await Context.SaveChangesAsync();
         }
     }
 
     public async Task<bool> ExistsAsync(Guid id) =>
-        await _context.Products.AnyAsync(p => p.Id == id && p.IsActive);
+        await Context.Products.AnyAsync(p => p.Id == id && p.IsActive);
 }

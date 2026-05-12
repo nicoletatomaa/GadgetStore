@@ -4,19 +4,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GadgetStore.Infrastructure.Persistence.Repositories;
 
-public class CategoryRepository : ICategoryRepository
+public class CategoryRepository : BaseRepository<Category>, ICategoryRepository
 {
-    private readonly GadgetStoreDbContext _context;
+    public CategoryRepository(GadgetStoreDbContext context) : base(context) { }
 
-    public CategoryRepository(GadgetStoreDbContext context) => _context = context;
+    protected override DbSet<Category> GetSet() => Context.Categories;
 
     public async Task<Category?> GetByIdAsync(int id) =>
-        await _context.Categories
+        await Context.Categories
             .Include(c => c.SubCategories)
             .FirstOrDefaultAsync(c => c.Id == id && c.IsActive);
 
     public async Task<IEnumerable<Category>> GetAllAsync() =>
-        await _context.Categories
+        await Context.Categories
             .Include(c => c.SubCategories)
             .Where(c => c.IsActive)
             .OrderBy(c => c.SortOrder)
@@ -24,7 +24,7 @@ public class CategoryRepository : ICategoryRepository
             .ToListAsync();
 
     public async Task<IEnumerable<Category>> GetRootCategoriesAsync() =>
-        await _context.Categories
+        await Context.Categories
             .Include(c => c.SubCategories)
             .Where(c => c.ParentCategoryId == null && c.IsActive)
             .OrderBy(c => c.SortOrder)
@@ -32,20 +32,8 @@ public class CategoryRepository : ICategoryRepository
             .ToListAsync();
 
     public async Task<IEnumerable<Category>> GetSubCategoriesAsync(int parentId) =>
-        await _context.Categories
+        await Context.Categories
             .Where(c => c.ParentCategoryId == parentId && c.IsActive)
             .OrderBy(c => c.SortOrder)
             .ToListAsync();
-
-    public async Task AddAsync(Category category)
-    {
-        await _context.Categories.AddAsync(category);
-        await _context.SaveChangesAsync();
-    }
-
-    public async Task UpdateAsync(Category category)
-    {
-        _context.Categories.Update(category);
-        await _context.SaveChangesAsync();
-    }
 }

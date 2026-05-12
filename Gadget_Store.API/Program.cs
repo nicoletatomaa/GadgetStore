@@ -35,6 +35,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICartRepository,     CartRepository>();
 builder.Services.AddScoped<ICouponRepository,   CouponRepository>();
 
+
 // ── JWT Authentication ─────────────────────────────────────────────────────────
 var jwtSection = builder.Configuration.GetSection("JwtSettings");
 builder.Services.Configure<JwtSettings>(jwtSection);
