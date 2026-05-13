@@ -25,6 +25,21 @@ public record LogoutRequest(
     [Required] string RefreshToken
 );
 
+public record UpdateProfileRequest(
+    [MaxLength(100)] string? FirstName,
+    [MaxLength(100)] string? LastName,
+    [MaxLength(20)]  string? Phone
+);
+
+public record ChangePasswordRequest(
+    [Required]               string CurrentPassword,
+    [Required, MinLength(8)] string NewPassword
+);
+
+public record ChangeRoleRequest(
+    [Required] string Role
+);
+
 // ── Response DTOs ──────────────────────────────────────────────────────────────
 
 public record AuthResponse(

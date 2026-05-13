@@ -10,8 +10,8 @@ export interface AuthResponse {
 export interface UserInfo {
   id: string
   email: string
-  firstName: string
-  lastName: string
+  firstName?: string
+  lastName?: string
   role: 'Customer' | 'Admin'
 }
 
@@ -30,7 +30,7 @@ export interface LoginRequest {
 // ─── Product ───────────────────────────────────────────────────────────────
 
 export interface Product {
-  id: number
+  id: string        // Guid din backend
   name: string
   description: string
   price: number

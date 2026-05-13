@@ -43,5 +43,7 @@ public class User
         UpdatedAt = DateTime.UtcNow;
     }
 
+    public void SetRole(string role) { Role = role; UpdatedAt = DateTime.UtcNow; }
+
     public void Deactivate() { IsActive = false; UpdatedAt = DateTime.UtcNow; }
 }

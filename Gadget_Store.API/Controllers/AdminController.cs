@@ -1,3 +1,4 @@
+using GadgetStore.API.DTOs;
 using GadgetStore.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -69,6 +70,43 @@ public class AdminController : ControllerBase
             },
             GeneratedAt = DateTime.UtcNow
         });
+    }
+
+    /// <summary>Lista toti utilizatorii paginat. Necesita rol Admin.</summary>
+    [HttpGet("users")]
+    public async Task<IActionResult> GetUsers(
+        [FromQuery] int page     = 1,
+        [FromQuery] int pageSize = 20)
+    {
+        var users = await _users.GetAllAsync(page, pageSize);
+        var result = users.Select(u => new
+        {
+            u.Id,
+            u.Email,
+            u.Role,
+            u.FirstName,
+            u.LastName,
+            u.Phone,
+            u.IsActive,
+            u.CreatedAt
+        });
+        return Ok(result);
+    }
+
+    /// <summary>Schimba rolul unui utilizator (Customer/Admin). Necesita rol Admin.</summary>
+    [HttpPatch("users/{id:guid}/role")]
+    public async Task<IActionResult> ChangeUserRole(Guid id, [FromBody] ChangeRoleRequest req)
+    {
+        if (req.Role is not ("Customer" or "Admin"))
+            return BadRequest(new { message = "Rol invalid. Valorile acceptate: Customer, Admin." });
+
+        var user = await _users.GetByIdAsync(id);
+        if (user is null) return NotFound(new { message = "Utilizatorul nu a fost gasit." });
+
+        user.SetRole(req.Role);
+        await _users.UpdateAsync(user);
+
+        return Ok(new { user.Id, user.Email, user.Role });
     }
 
     /// <summary>

@@ -124,16 +124,16 @@ export const productsService = {
   getAll: (filters?: ProductFilters) =>
     api.get<PagedResult<Product>>('/api/products', { params: filters }).then((r) => r.data),
 
-  getById: (id: number) =>
+  getById: (id: string) =>
     api.get<Product>(`/api/products/${id}`).then((r) => r.data),
 
   create: (data: Partial<Product>) =>
     api.post<Product>('/api/products', data).then((r) => r.data),
 
-  update: (id: number, data: Partial<Product>) =>
+  update: (id: string, data: Partial<Product>) =>
     api.put<Product>(`/api/products/${id}`, data).then((r) => r.data),
 
-  delete: (id: number) =>
+  delete: (id: string) =>
     api.delete(`/api/products/${id}`),
 
   cloneFromTemplate: (templateKey: string, overrides: Partial<Product>) =>
@@ -142,13 +142,13 @@ export const productsService = {
   getTemplates: () =>
     api.get<string[]>('/api/products/templates').then((r) => r.data),
 
-  updateStock: (id: number, stock: number) =>
-    api.patch(`/api/products/${id}/stock`, { stock }),
+  updateStock: (id: string, stock: number) =>
+    api.patch(`/api/products/${id}/stock`, { newStock: stock }),
 
-  updatePrice: (id: number, price: number) =>
-    api.patch(`/api/products/${id}/price`, { price }),
+  updatePrice: (id: string, price: number) =>
+    api.patch(`/api/products/${id}/price`, { newPrice: price }),
 
-  calculateOffer: (productId: number, decorators: string[]) =>
+  calculateOffer: (productId: string, decorators: string[]) =>
     api.post<ProductOffer>('/api/products/offers', { productId, decorators }).then((r) => r.data),
 }
 
@@ -251,10 +251,10 @@ export const regionalService = {
 import type { Review, CreateReviewRequest } from '@/types'
 
 export const reviewsService = {
-  getByProduct: (productId: number) =>
+  getByProduct: (productId: string) =>
     api.get<Review[]>(`/api/reviews/products/${productId}`).then((r) => r.data),
 
-  create: (productId: number, data: CreateReviewRequest) =>
+  create: (productId: string, data: CreateReviewRequest) =>
     api.post<Review>(`/api/reviews/products/${productId}`, data).then((r) => r.data),
 
   delete: (reviewId: number) =>

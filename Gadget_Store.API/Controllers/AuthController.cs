@@ -102,11 +102,8 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> LogoutAll()
     {
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
-                       ?? User.FindFirst("sub")?.Value;
-
-        if (userIdClaim is null || !Guid.TryParse(userIdClaim, out var userId))
-            return Unauthorized();
+        var userId = GetCurrentUserId();
+        if (userId == Guid.Empty) return Unauthorized();
 
         await _tokens.RevokeAllUserTokensAsync(userId);
         return NoContent();
@@ -120,11 +117,8 @@ public class AuthController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Me()
     {
-        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
-                       ?? User.FindFirst("sub")?.Value;
-
-        if (userIdClaim is null || !Guid.TryParse(userIdClaim, out var userId))
-            return Unauthorized();
+        var userId = GetCurrentUserId();
+        if (userId == Guid.Empty) return Unauthorized();
 
         var user = await _users.GetByIdAsync(userId);
         if (user is null) return Unauthorized();
@@ -132,7 +126,56 @@ public class AuthController : ControllerBase
         return Ok(new UserInfo(user.Id, user.Email, user.Role, user.FirstName, user.LastName));
     }
 
+    // ── PATCH /api/auth/profile ───────────────────────────────────────────────
+    /// <summary>Actualizeaza profilul utilizatorului autentificat.</summary>
+    [HttpPatch("profile")]
+    [Authorize]
+    [ProducesResponseType(typeof(UserInfo), StatusCodes.Status200OK)]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest req)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == Guid.Empty) return Unauthorized();
+
+        var user = await _users.GetByIdAsync(userId);
+        if (user is null) return Unauthorized();
+
+        user.UpdateProfile(req.FirstName, req.LastName, req.Phone);
+        await _users.UpdateAsync(user);
+
+        return Ok(new UserInfo(user.Id, user.Email, user.Role, user.FirstName, user.LastName));
+    }
+
+    // ── PATCH /api/auth/password ──────────────────────────────────────────────
+    /// <summary>Schimba parola utilizatorului autentificat.</summary>
+    [HttpPatch("password")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest req)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == Guid.Empty) return Unauthorized();
+
+        var user = await _users.GetByIdAsync(userId);
+        if (user is null) return Unauthorized();
+
+        if (!BCrypt.Net.BCrypt.Verify(req.CurrentPassword, user.PasswordHash))
+            return BadRequest(new { message = "Parola curenta este incorecta." });
+
+        user.UpdatePassword(BCrypt.Net.BCrypt.HashPassword(req.NewPassword));
+        await _users.UpdateAsync(user);
+
+        return NoContent();
+    }
+
     // ── Helper ────────────────────────────────────────────────────────────────
+    private Guid GetCurrentUserId()
+    {
+        var claim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                 ?? User.FindFirst("sub")?.Value;
+        return Guid.TryParse(claim, out var id) ? id : Guid.Empty;
+    }
+
     private async Task<AuthResponse> BuildAuthResponse(User user)
     {
         var accessToken  = _tokens.GenerateAccessToken(user);

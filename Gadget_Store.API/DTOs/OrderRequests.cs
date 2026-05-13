@@ -17,6 +17,8 @@ public class BuildExpressOrderRequest
      public decimal TaxRate { get; set; } = 0.19m;
 }
 
+public record UpdateOrderStatusRequest(string Status);
+
 public class OrderItemDto
 {
      public string ProductName { get; set; } = string.Empty;
