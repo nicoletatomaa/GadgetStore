@@ -6,6 +6,7 @@ using GadgetStore.Infrastructure.Checkout;
 using GadgetStore.Infrastructure.Payments;
 using GadgetStore.Infrastructure.Persistence;
 using GadgetStore.Infrastructure.Persistence.Repositories;
+using GadgetStore.API.Middleware;
 using GadgetStore.Patterns.Behavioral.Observer;
 using GadgetStore.Infrastructure.Regional.Asia;
 using GadgetStore.Infrastructure.Regional.EU;
@@ -36,6 +37,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICartRepository,     CartRepository>();
 builder.Services.AddScoped<ICouponRepository,   CouponRepository>();
 builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
+builder.Services.AddScoped<IReviewRepository,   ReviewRepository>();
 
 // ── Observer — DB-backed observers (Etapa 4) ──────────────────────────────────
 builder.Services.AddScoped<WishlistNotificationObserver>();
@@ -190,6 +192,8 @@ using (var scope = app.Services.CreateScope())
 }
 
 // ── Middleware Pipeline ────────────────────────────────────────────────────────
+app.UseMiddleware<GlobalExceptionMiddleware>();   // primul in pipeline
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

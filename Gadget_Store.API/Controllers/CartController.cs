@@ -1,6 +1,7 @@
 ﻿using GadgetStore.API.DTOs;
 using GadgetStore.Patterns.Behavioral.Command;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GadgetStore.API.Controllers;
 
@@ -71,6 +72,28 @@ public class CartController : ControllerBase
             return BadRequest(new { message = "Nu există operații de anulat." });
 
         return Ok(BuildCartResponse($"Undo executat: {undone}"));
+    }
+
+    /// <summary>
+    /// Modifica cantitatea unui produs din cos.
+    /// Pattern: Command — UpdateQuantityCommand cu suport undo la cantitatea anterioara.
+    /// </summary>
+    [HttpPut("update")]
+    public IActionResult UpdateQuantity([FromBody] UpdateCartQuantityRequest request)
+    {
+        var command = new UpdateQuantityCommand(
+            _cart, request.ProductName, request.UnitPrice, request.NewQuantity);
+        _invoker.ExecuteCommand(command);
+
+        return Ok(BuildCartResponse("Cantitate actualizata."));
+    }
+
+    /// <summary>Goleste complet cosul de cumparaturi.</summary>
+    [HttpDelete("clear")]
+    public IActionResult Clear()
+    {
+        while (_invoker.Undo() is not null) { }   // anuleaza toate comenzile din stiva
+        return Ok(BuildCartResponse("Cosul a fost golit."));
     }
 
     private object BuildCartResponse(string? message = null) => new
