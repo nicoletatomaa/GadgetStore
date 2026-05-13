@@ -38,4 +38,22 @@ public class Cart
 
         return true;
     }
+
+    // Returneaza cantitatea veche (pentru undo), sau null daca produsul nu exista.
+    public int? UpdateItemQuantity(string productName, decimal unitPrice, int newQty)
+    {
+        var existing = _items.FirstOrDefault(i =>
+            i.ProductName == productName && i.UnitPrice == unitPrice);
+
+        if (existing is null) return null;
+
+        var oldQty = existing.Quantity;
+
+        if (newQty <= 0)
+            _items.Remove(existing);
+        else
+            existing.Quantity = newQty;
+
+        return oldQty;
+    }
 }

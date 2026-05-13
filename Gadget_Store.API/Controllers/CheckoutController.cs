@@ -31,7 +31,14 @@ public class CheckoutController : ControllerBase
             var validationRequest = new OrderValidationRequest
             {
                 Items = request.Items
-                    .Select(i => (i.ProductName, i.UnitPrice, i.Quantity))
+                    .Select(i => new OrderValidationItem
+                    {
+                        Name  = i.ProductName,
+                        Price = i.UnitPrice,
+                        Qty   = i.Quantity
+                        // ProductId ramane Guid.Empty — StockAvailabilityHandler
+                        // il ignora cand nu e furnizat (demo fara ProductId)
+                    })
                     .ToList(),
                 Region = request.Region,
                 DiscountAmount = request.DiscountAmount

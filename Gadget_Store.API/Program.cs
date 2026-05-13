@@ -6,6 +6,7 @@ using GadgetStore.Infrastructure.Checkout;
 using GadgetStore.Infrastructure.Payments;
 using GadgetStore.Infrastructure.Persistence;
 using GadgetStore.Infrastructure.Persistence.Repositories;
+using GadgetStore.Patterns.Behavioral.Observer;
 using GadgetStore.Infrastructure.Regional.Asia;
 using GadgetStore.Infrastructure.Regional.EU;
 using GadgetStore.Infrastructure.Regional.US;
@@ -34,6 +35,11 @@ builder.Services.AddScoped<IUserRepository,     UserRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICartRepository,     CartRepository>();
 builder.Services.AddScoped<ICouponRepository,   CouponRepository>();
+builder.Services.AddScoped<IWishlistRepository, WishlistRepository>();
+
+// ── Observer — DB-backed observers (Etapa 4) ──────────────────────────────────
+builder.Services.AddScoped<WishlistNotificationObserver>();
+builder.Services.AddScoped<PriceDropObserver>();
 
 
 // ── JWT Authentication ─────────────────────────────────────────────────────────
@@ -166,12 +172,16 @@ var app = builder.Build();
 // ── Database Migration & Seeding ──────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<GadgetStoreDbContext>();
-    var logger  = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    var context          = scope.ServiceProvider.GetRequiredService<GadgetStoreDbContext>();
+    var logger           = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    var templateRegistry = scope.ServiceProvider.GetRequiredService<ProductTemplateRegistry>();
     try
     {
         await DbSeeder.SeedAsync(context);
         logger.LogInformation("Baza de date initializata si seeded cu succes.");
+
+        // Prototype pattern — incarca template-urile din DB (Etapa 4)
+        await ProductTemplateRegistryInitializer.LoadFromDbAsync(templateRegistry, context);
     }
     catch (Exception ex)
     {
