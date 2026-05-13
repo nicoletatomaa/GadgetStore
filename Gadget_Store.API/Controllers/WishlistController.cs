@@ -46,10 +46,12 @@ public class WishlistController : ControllerBase
         return Ok(items.Select(w => new
         {
             w.Id,
-            ProductId   = w.ProductId,
-            ProductName = w.Product?.Name,
-            Price       = w.Product?.Price,
-            w.AddedAt
+            ProductId       = w.ProductId,
+            ProductName     = w.Product?.Name ?? "—",
+            ProductPrice    = w.Product?.Price ?? 0m,
+            ProductStock    = w.Product?.Stock ?? 0,
+            ProductImageUrl = w.Product?.ImageUrl,
+            w.AddedAt,
         }));
     }
 

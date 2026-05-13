@@ -3,10 +3,22 @@ import { useCartStore } from '@/store/cartStore'
 import { useCartQuery, useRemoveFromCart, useUndoCart } from '@/hooks/useCart'
 
 export default function CartPage() {
-  useCartQuery()
+  const { isLoading } = useCartQuery()
   const { items, subtotal, canUndo } = useCartStore()
-  const { mutate: removeItem } = useRemoveFromCart()
-  const { mutate: undoCart } = useUndoCart()
+  const { mutate: removeItem, isPending: removing } = useRemoveFromCart()
+  const { mutate: undoCart, isPending: undoing } = useUndoCart()
+
+  if (isLoading) {
+    return (
+      <div className="max-w-3xl mx-auto space-y-3 animate-pulse">
+        <div className="h-8 bg-gray-200 rounded w-1/3" />
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="card p-4 h-20 bg-gray-100" />
+        ))}
+        <div className="card p-4 h-28 bg-gray-100" />
+      </div>
+    )
+  }
 
   if (items.length === 0) {
     return (

@@ -68,7 +68,7 @@ export interface PagedResult<T> {
 }
 
 export interface ProductOffer {
-  productId: number
+  productId: string    // Guid din backend
   productName: string
   basePrice: number
   finalPrice: number
@@ -93,7 +93,7 @@ export interface Category {
 
 export interface CartItem {
   id: number
-  productId: number
+  productId: string    // Guid din backend
   productName: string
   productImageUrl?: string
   unitPrice: number
@@ -106,10 +106,11 @@ export interface Cart {
   items: CartItem[]
   subtotal: number
   itemCount: number
+  canUndo?: boolean
 }
 
 export interface AddToCartRequest {
-  productId: number
+  productId: string    // Guid din backend
   quantity: number
   decorators?: string[]
 }
@@ -229,7 +230,7 @@ export interface CreateReviewRequest {
 
 export interface WishlistItem {
   id: number
-  productId: number
+  productId: string    // Guid din backend
   productName: string
   productPrice: number
   productImageUrl?: string
@@ -287,7 +288,7 @@ export interface Coupon {
 // ─── Alert ─────────────────────────────────────────────────────────────────
 
 export interface AlertSubscribeRequest {
-  productId: number
+  productId: string    // Guid din backend
   thresholdQty?: number
   alertOnPriceDrop?: boolean
 }

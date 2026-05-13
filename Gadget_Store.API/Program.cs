@@ -1,4 +1,5 @@
 using System.Text;
+using GadgetStore.API.Services;
 using GadgetStore.Application.Interfaces;
 using GadgetStore.Domain.Entities;
 using GadgetStore.Infrastructure.Auth;
@@ -164,9 +165,12 @@ builder.Services.AddSingleton<ICatalogComponent>(rootCatalog);
 // ── Facade — Checkout ──────────────────────────────────────────────────────────
 builder.Services.AddScoped<ICheckoutFacade, CheckoutFacade>();
 
-// ── Command — Cart (Scoped per sesiune HTTP) ───────────────────────────────────
+// ── Command — Cart ─────────────────────────────────────────────────────────────
+// Cart si CartInvoker raman Scoped pentru utilizare in WishlistController (move-to-cart)
 builder.Services.AddScoped<GadgetStore.Patterns.Behavioral.Command.Cart>();
 builder.Services.AddScoped<GadgetStore.Patterns.Behavioral.Command.CartInvoker>();
+// CartUndoManager e Singleton — retine stiva de undo per userId intre request-uri
+builder.Services.AddSingleton<CartUndoManager>();
 
 // ─────────────────────────────────────────────────────────────────────────────
 var app = builder.Build();

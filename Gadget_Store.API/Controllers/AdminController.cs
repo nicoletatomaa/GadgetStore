@@ -44,31 +44,17 @@ public class AdminController : ControllerBase
 
         var allUsers = await _users.GetAllAsync(1, 50);
 
+        var thisMonth     = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+        var ordersThisMonth = allOrders.Count(o => o.CreatedAt >= thisMonth);
+
         return Ok(new
         {
-            Products = new
-            {
-                Total         = totalProducts,
-                CriticalStock = criticalStock.Count,
-                CriticalItems = criticalStock.Select(p => new
-                {
-                    p.Name,
-                    p.Stock,
-                    p.Price
-                })
-            },
-            Orders = new
-            {
-                Total    = allOrders.Count(),
-                Today    = todayOrders.Count,
-                Revenue  = allOrders.Sum(o => o.TotalAmount),
-                TodayRevenue = todayOrders.Sum(o => o.TotalAmount)
-            },
-            Users = new
-            {
-                Total = allUsers.Count()
-            },
-            GeneratedAt = DateTime.UtcNow
+            salesToday      = todayOrders.Sum(o => o.TotalAmount),
+            newOrders       = todayOrders.Count,
+            criticalStock   = criticalStock.Count,
+            newUsers        = allUsers.Count(u => u.CreatedAt.Date == today),
+            totalRevenue    = allOrders.Sum(o => o.TotalAmount),
+            ordersThisMonth,
         });
     }
 

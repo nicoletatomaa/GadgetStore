@@ -1,112 +1,262 @@
-﻿using GadgetStore.API.DTOs;
-using GadgetStore.Patterns.Behavioral.Command;
-using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.Text.Json;
+using GadgetStore.API.DTOs;
+using GadgetStore.API.Services;
+using GadgetStore.Application.Interfaces;
+using GadgetStore.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GadgetStore.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/cart")]
+[Authorize]
 public class CartController : ControllerBase
 {
-    private readonly Cart _cart;
-    private readonly CartInvoker _invoker;
+    private readonly ICartRepository    _cartRepo;
+    private readonly IProductRepository _products;
+    private readonly CartUndoManager    _undoManager;
 
-    public CartController(Cart cart, CartInvoker invoker)
+    public CartController(
+        ICartRepository    cartRepo,
+        IProductRepository products,
+        CartUndoManager    undoManager)
     {
-        _cart = cart;
-        _invoker = invoker;
+        _cartRepo    = cartRepo;
+        _products    = products;
+        _undoManager = undoManager;
     }
 
-    /// <summary>
-    /// Returnează conținutul curent al coșului.
-    /// </summary>
+    private Guid GetUserId()
+    {
+        var str = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Guid.TryParse(str, out var id) ? id : Guid.Empty;
+    }
+
+    // ── GET /api/cart ─────────────────────────────────────────────────────────
+    /// <summary>Returneaza cosul curent al utilizatorului din baza de date.</summary>
     [HttpGet]
-    public IActionResult GetCart() => Ok(BuildCartResponse());
-
-    /// <summary>
-    /// Adaugă un produs în coș.
-    /// Pattern: Command — AddToCartCommand este creat și executat prin CartInvoker.
-    /// Comanda este stocată în stivă pentru undo ulterior.
-    /// </summary>
-    [HttpPost("add")]
-    public IActionResult Add([FromBody] AddToCartRequest request)
+    public async Task<IActionResult> GetCart()
     {
-        var item = new CartItem
+        var userId = GetUserId();
+        var items  = await _cartRepo.GetByUserAsync(userId);
+        return Ok(BuildResponse(items, userId));
+    }
+
+    // ── POST /api/cart/items — Command pattern ────────────────────────────────
+    /// <summary>
+    /// Adauga un produs in cos.
+    /// Pattern: Command — operatia este inregistrata in stiva undo (CartUndoManager).
+    /// Undo: elimina produsul din cos.
+    /// </summary>
+    [HttpPost("items")]
+    public async Task<IActionResult> AddItem([FromBody] AddToCartRequest req)
+    {
+        var userId  = GetUserId();
+        var product = await _products.GetByIdAsync(req.ProductId);
+        if (product is null) return NotFound(new { message = "Produsul nu a fost gasit." });
+        if (product.Stock < req.Quantity) return BadRequest(new { message = $"Stoc insuficient. Disponibil: {product.Stock}" });
+
+        var decoratorsJson = req.Decorators.Count > 0
+            ? JsonSerializer.Serialize(req.Decorators)
+            : null;
+
+        var existing = await _cartRepo.GetItemAsync(userId, req.ProductId);
+        int cartItemId;
+        int oldQty = 0;
+        bool isNew;
+
+        if (existing is not null)
         {
-            ProductName = request.ProductName,
-            UnitPrice = request.UnitPrice,
-            Quantity = request.Quantity
-        };
+            oldQty = existing.Quantity;
+            existing.UpdateQuantity(existing.Quantity + req.Quantity);
+            existing.UpdateDecorators(decoratorsJson ?? existing.Decorators);
+            await _cartRepo.UpdateAsync(existing);
+            cartItemId = existing.Id;
+            isNew = false;
+        }
+        else
+        {
+            var item = new CartItem(userId, req.ProductId, req.Quantity, decoratorsJson);
+            await _cartRepo.AddAsync(item);
+            cartItemId = item.Id;
+            isNew = true;
+        }
 
-        var command = new AddToCartCommand(_cart, item);
-        _invoker.ExecuteCommand(command);
+        // Command pattern — inregistreaza operatia inversa in stiva undo
+        if (isNew)
+        {
+            _undoManager.Push(userId, async () =>
+            {
+                await _cartRepo.RemoveAsync(cartItemId);
+                return $"Undo: eliminat '{product.Name}' din cos";
+            });
+        }
+        else
+        {
+            var savedOldQty = oldQty;
+            _undoManager.Push(userId, async () =>
+            {
+                var ci = await _cartRepo.GetItemAsync(userId, req.ProductId);
+                if (ci is not null) { ci.UpdateQuantity(savedOldQty); await _cartRepo.UpdateAsync(ci); }
+                return $"Undo: cantitate '{product.Name}' restaurata la {savedOldQty}";
+            });
+        }
 
-        return Ok(BuildCartResponse("Produs adăugat."));
+        var items = await _cartRepo.GetByUserAsync(userId);
+        return Ok(BuildResponse(items, userId));
     }
 
+    // ── DELETE /api/cart/items/{id} — Command pattern ─────────────────────────
     /// <summary>
-    /// Elimină un produs din coș.
-    /// Pattern: Command — RemoveFromCartCommand stochează starea
-    /// pentru a putea fi inversat prin undo.
+    /// Elimina un produs din cos.
+    /// Pattern: Command — operatia este inregistrata in stiva undo (CartUndoManager).
+    /// Undo: readauga produsul cu cantitatea si decoratorii originali.
     /// </summary>
-    [HttpDelete("remove")]
-    public IActionResult Remove([FromBody] RemoveFromCartRequest request)
+    [HttpDelete("items/{id:int}")]
+    public async Task<IActionResult> RemoveItem(int id)
     {
-        var command = new RemoveFromCartCommand(
-            _cart, request.ProductName, request.UnitPrice, request.Quantity);
-        _invoker.ExecuteCommand(command);
+        var userId = GetUserId();
+        var items  = await _cartRepo.GetByUserAsync(userId);
+        var item   = items.FirstOrDefault(i => i.Id == id);
+        if (item is null) return NotFound(new { message = "Produsul nu este in cos." });
 
-        return Ok(BuildCartResponse("Produs eliminat."));
+        var savedProductId  = item.ProductId;
+        var savedQuantity   = item.Quantity;
+        var savedDecorators = item.Decorators;
+
+        await _cartRepo.RemoveAsync(id);
+
+        // Command pattern — inregistreaza operatia inversa
+        _undoManager.Push(userId, async () =>
+        {
+            var restore = new CartItem(userId, savedProductId, savedQuantity, savedDecorators);
+            await _cartRepo.AddAsync(restore);
+            return $"Undo: produs readaugat in cos (qty {savedQuantity})";
+        });
+
+        var updated = await _cartRepo.GetByUserAsync(userId);
+        return Ok(BuildResponse(updated, userId));
     }
 
+    // ── PUT /api/cart/update — Command pattern ────────────────────────────────
     /// <summary>
-    /// Anulează ultima operație efectuată pe coș.
-    /// Pattern: Command — Invoker scoate ultima comandă din stivă și apelează Undo().
-    /// </summary>
-    [HttpPost("undo")]
-    public IActionResult Undo()
-    {
-        var undone = _invoker.Undo();
-        if (undone is null)
-            return BadRequest(new { message = "Nu există operații de anulat." });
-
-        return Ok(BuildCartResponse($"Undo executat: {undone}"));
-    }
-
-    /// <summary>
-    /// Modifica cantitatea unui produs din cos.
-    /// Pattern: Command — UpdateQuantityCommand cu suport undo la cantitatea anterioara.
+    /// Modifica cantitatea unui item din cos.
+    /// Pattern: Command — cantitatea anterioara este salvata pentru undo.
     /// </summary>
     [HttpPut("update")]
-    public IActionResult UpdateQuantity([FromBody] UpdateCartQuantityRequest request)
+    public async Task<IActionResult> UpdateQuantity([FromBody] UpdateCartQuantityRequestNew req)
     {
-        var command = new UpdateQuantityCommand(
-            _cart, request.ProductName, request.UnitPrice, request.NewQuantity);
-        _invoker.ExecuteCommand(command);
+        var userId = GetUserId();
+        var allItems = await _cartRepo.GetByUserAsync(userId);
+        var item     = allItems.FirstOrDefault(i => i.Id == req.CartItemId);
+        if (item is null) return NotFound(new { message = "Produsul nu este in cos." });
 
-        return Ok(BuildCartResponse("Cantitate actualizata."));
-    }
+        var oldQty = item.Quantity;
+        item.UpdateQuantity(req.Quantity);
+        await _cartRepo.UpdateAsync(item);
 
-    /// <summary>Goleste complet cosul de cumparaturi.</summary>
-    [HttpDelete("clear")]
-    public IActionResult Clear()
-    {
-        while (_invoker.Undo() is not null) { }   // anuleaza toate comenzile din stiva
-        return Ok(BuildCartResponse("Cosul a fost golit."));
-    }
-
-    private object BuildCartResponse(string? message = null) => new
-    {
-        Message = message,
-        Items = _cart.Items.Select(i => new
+        // Command pattern — salveaza cantitatea veche pentru undo
+        var savedId  = item.Id;
+        var savedOld = oldQty;
+        _undoManager.Push(userId, async () =>
         {
-            i.ProductName,
-            i.UnitPrice,
-            i.Quantity,
-            i.LineTotal
-        }),
-        Total = _cart.Total,
-        History = _invoker.GetHistory().ToList()
-    };
+            var ci = (await _cartRepo.GetByUserAsync(userId)).FirstOrDefault(i => i.Id == savedId);
+            if (ci is not null) { ci.UpdateQuantity(savedOld); await _cartRepo.UpdateAsync(ci); }
+            return $"Undo: cantitate restaurata la {savedOld}";
+        });
+
+        var updated = await _cartRepo.GetByUserAsync(userId);
+        return Ok(BuildResponse(updated, userId));
+    }
+
+    // ── POST /api/cart/undo — Command pattern ─────────────────────────────────
+    /// <summary>
+    /// Anuleaza ultima operatie efectuata pe cos.
+    /// Pattern: Command — CartUndoManager scoate ultima actiune din stiva si o executa invers.
+    /// </summary>
+    [HttpPost("undo")]
+    public async Task<IActionResult> Undo()
+    {
+        var userId = GetUserId();
+        var description = await _undoManager.Undo(userId);
+        if (description is null)
+            return BadRequest(new { message = "Nu exista operatii de anulat." });
+
+        var items = await _cartRepo.GetByUserAsync(userId);
+        var response = BuildResponse(items, userId);
+        return Ok(new { message = description, cart = response });
+    }
+
+    // ── DELETE /api/cart ──────────────────────────────────────────────────────
+    /// <summary>Goleste complet cosul si stiva de undo.</summary>
+    [HttpDelete]
+    public async Task<IActionResult> Clear()
+    {
+        var userId = GetUserId();
+        await _cartRepo.ClearAsync(userId);
+        _undoManager.Clear(userId);
+        return Ok(BuildResponse(Enumerable.Empty<CartItem>(), userId));
+    }
+
+    // ── Helper ────────────────────────────────────────────────────────────────
+    private object BuildResponse(IEnumerable<CartItem> items, Guid userId)
+    {
+        var list = items.Select(i =>
+        {
+            var decorators = i.Decorators is not null
+                ? JsonSerializer.Deserialize<string[]>(i.Decorators) ?? Array.Empty<string>()
+                : Array.Empty<string>();
+
+            var unitPrice   = i.Product?.Price ?? 0m;
+            var extraPrice  = CalculateDecoratorExtra(decorators, unitPrice);
+            var finalPrice  = unitPrice + extraPrice;
+
+            return new
+            {
+                i.Id,
+                ProductId   = i.ProductId,
+                ProductName = i.Product?.Name ?? "—",
+                UnitPrice   = unitPrice,
+                i.Quantity,
+                Decorators  = decorators,
+                FinalPrice  = finalPrice,
+            };
+        }).ToList();
+
+        var subtotal  = list.Sum(i => (decimal)i.FinalPrice * i.Quantity);
+        var itemCount = list.Sum(i => i.Quantity);
+
+        return new
+        {
+            Items     = list,
+            Subtotal  = subtotal,
+            ItemCount = itemCount,
+            CanUndo   = _undoManager.CanUndo(userId),
+        };
+    }
+
+    private static decimal CalculateDecoratorExtra(string[] decorators, decimal basePrice)
+    {
+        var extra = 0m;
+        foreach (var d in decorators)
+        {
+            extra += d switch
+            {
+                "Warranty"  => 49m,
+                "GiftWrap"  => 15m,
+                "Insurance" => basePrice * 0.02m,
+                _           => 0m
+            };
+        }
+        return extra;
+    }
+}
+
+// DTO pentru update cantitate (separat pentru a evita conflicte cu vechiul DTO)
+public class UpdateCartQuantityRequestNew
+{
+    public int CartItemId { get; set; }
+    public int Quantity   { get; set; }
 }

@@ -183,10 +183,10 @@ export const cartService = {
     api.put<Cart>('/api/cart/update', data).then((r) => r.data),
 
   undo: () =>
-    api.post<Cart>('/api/cart/undo').then((r) => r.data),
+    api.post<{ message: string; cart: Cart }>('/api/cart/undo').then((r) => r.data.cart),
 
   clear: () =>
-    api.delete('/api/cart'),
+    api.delete<Cart>('/api/cart').then((r) => r.data),
 }
 
 // ─── Checkout endpoints ────────────────────────────────────────────────────
@@ -269,13 +269,13 @@ export const wishlistService = {
   get: () =>
     api.get<WishlistItem[]>('/api/wishlist').then((r) => r.data),
 
-  add: (productId: number) =>
+  add: (productId: string) =>
     api.post('/api/wishlist', { productId }),
 
-  remove: (productId: number) =>
+  remove: (productId: string) =>
     api.delete(`/api/wishlist/${productId}`),
 
-  moveToCart: (productId: number) =>
+  moveToCart: (productId: string) =>
     api.post(`/api/wishlist/${productId}/move-to-cart`),
 }
 
@@ -299,6 +299,17 @@ export const alertsService = {
   subscribe: (data: AlertSubscribeRequest) =>
     api.post('/api/alerts/subscribe', data),
 
-  unsubscribe: (productId: number) =>
+  unsubscribe: (productId: string) =>
     api.delete('/api/alerts/unsubscribe', { data: { productId } }),
+}
+
+// ── Admin users service (endpoint-uri din AdminController) ────────────────────
+import type { UserInfo } from '@/types'
+
+export const adminUsersService = {
+  getAll: () =>
+    api.get<UserInfo[]>('/api/admin/users').then((r) => r.data),
+
+  changeRole: (userId: string, role: string) =>
+    api.patch(`/api/admin/users/${userId}/role`, { role }),
 }
