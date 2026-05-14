@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useLogin } from '@/hooks/useAuth'
 
@@ -35,7 +35,7 @@ export default function LoginPage() {
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
               className="input"
-              placeholder="••••••••"
+              placeholder="вЂўвЂўвЂўвЂўвЂўвЂўвЂўвЂў"
             />
           </div>
           <button type="submit" disabled={isPending} className="btn-primary w-full py-2.5">
@@ -50,3 +50,4 @@ export default function LoginPage() {
     </div>
   )
 }
+

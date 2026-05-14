@@ -223,7 +223,7 @@ export default function CatalogPage() {
                   </div>
                   <p className="text-sm font-medium text-gray-800 group-hover:text-brand line-clamp-2">{product.name}</p>
                   <p className="text-xs text-gray-400 mt-0.5">{product.brand}</p>
-                  <p className="text-brand font-bold mt-1">{product.price.toFixed(2)} RON</p>
+                  <p className="text-brand font-bold mt-1">{product.price.toFixed(2)} MDL</p>
                   <p className="text-xs mt-0.5">
                     {product.stock > 0
                       ? <span className="text-green-600">In stoc</span>
@@ -242,7 +242,7 @@ export default function CatalogPage() {
           </div>
         ) : (
           <div className="text-center py-20 text-gray-500">
-            <p className="text-5xl mb-4">🔍</p>
+            <p className="text-5xl mb-4">( )</p>
             <p className="text-lg font-medium">Nu am gasit produse</p>
             <p className="text-sm mt-1">Incearca sa modifici filtrele sau cauta altceva</p>
             <button onClick={resetFilters} className="btn-secondary mt-4">Sterge filtrele</button>
@@ -296,3 +296,4 @@ export default function CatalogPage() {
     </div>
   )
 }
+

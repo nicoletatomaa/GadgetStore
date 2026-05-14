@@ -89,7 +89,7 @@ export default function ProductPage() {
 
   if (!product) return (
     <div className="text-center py-16 space-y-3">
-      <p className="text-5xl">❓</p>
+      <p className="text-5xl">вќ"</p>
       <p className="text-gray-500">Produsul nu a fost gasit.</p>
       <Link to="/catalog" className="btn-secondary inline-flex">Inapoi la catalog</Link>
     </div>
@@ -120,10 +120,10 @@ export default function ProductPage() {
 
           <div className="flex items-end gap-3">
             <p className="text-3xl font-bold text-brand">
-              {(product.price + decoratorExtra).toFixed(2)} RON
+              {(product.price + decoratorExtra).toFixed(2)} MDL
             </p>
             {decoratorExtra > 0 && (
-              <p className="text-sm text-gray-400 mb-1 line-through">{product.price.toFixed(2)} RON</p>
+              <p className="text-sm text-gray-400 mb-1 line-through">{product.price.toFixed(2)} MDL</p>
             )}
           </div>
 
@@ -150,7 +150,7 @@ export default function ProductPage() {
                   <p className="text-xs text-gray-500">{d.description}</p>
                 </div>
                 <span className="text-sm font-medium text-brand">
-                  {d.price ? `+${d.price} RON` : `+${((d.pct ?? 0) * 100).toFixed(0)}%`}
+                  {d.price ? `+${d.price} MDL` : `+${((d.pct ?? 0) * 100).toFixed(0)}%`}
                 </span>
               </label>
             ))}
@@ -160,7 +160,7 @@ export default function ProductPage() {
           <div className="flex items-center gap-3">
             <label className="text-sm font-medium text-gray-700">Cantitate:</label>
             <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 py-1.5 hover:bg-gray-100 text-lg leading-none">−</button>
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 py-1.5 hover:bg-gray-100 text-lg leading-none">в€'</button>
               <span className="px-4 py-1.5 text-sm font-medium min-w-[2.5rem] text-center">{quantity}</span>
               <button onClick={() => setQuantity(Math.min(product.stock, quantity + 1))} className="px-3 py-1.5 hover:bg-gray-100 text-lg leading-none">+</button>
             </div>
@@ -283,3 +283,4 @@ export default function ProductPage() {
     </div>
   )
 }
+

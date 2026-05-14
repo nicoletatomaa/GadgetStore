@@ -3,7 +3,8 @@
 export interface AuthResponse {
   accessToken: string
   refreshToken: string
-  expiresIn: number
+  expiresAt?: string
+  expiresIn?: number
   user: UserInfo
 }
 

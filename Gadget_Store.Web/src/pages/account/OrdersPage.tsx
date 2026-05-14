@@ -32,7 +32,7 @@ export default function OrdersPage() {
                 <p className="text-xs text-gray-400">{new Date(order.createdAt).toLocaleDateString('ro-RO')}</p>
               </div>
               <div className="text-right">
-                <p className="font-bold text-brand">{order.totalAmount.toFixed(2)} RON</p>
+                <p className="font-bold text-brand">{order.totalAmount.toFixed(2)} MDL</p>
                 <span className={statusColor[order.status] ?? 'badge-gray'}>{order.status}</span>
               </div>
             </Link>
@@ -40,7 +40,7 @@ export default function OrdersPage() {
         </div>
       ) : (
         <div className="text-center py-16 text-gray-500">
-          <p className="text-5xl mb-4">📭</p>
+          <p className="text-5xl mb-4">рџ"­</p>
           <p>Nu ai plasate comenzi inca.</p>
           <Link to="/catalog" className="btn-primary inline-flex mt-4">Incepe cumparaturile</Link>
         </div>
@@ -48,3 +48,4 @@ export default function OrdersPage() {
     </div>
   )
 }
+

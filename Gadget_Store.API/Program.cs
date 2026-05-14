@@ -208,8 +208,10 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-app.UseHttpsRedirection();
 app.UseCors("FrontendPolicy");
+
+if (!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 
 app.UseAuthentication();   // JWT middleware — INAINTE de Authorization
 app.UseAuthorization();

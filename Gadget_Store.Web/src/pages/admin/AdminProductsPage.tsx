@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { productsService, catalogService } from '@/services/api'
 import { useUiStore } from '@/store/uiStore'
@@ -149,7 +149,7 @@ export default function AdminProductsPage() {
                     <p className="font-medium text-gray-800">{p.name}</p>
                     <p className="text-xs text-gray-400">{p.brand}</p>
                   </td>
-                  <td className="px-4 py-3 font-medium text-brand">{p.price.toFixed(2)} RON</td>
+                  <td className="px-4 py-3 font-medium text-brand">{p.price.toFixed(2)} MDL</td>
                   <td className="px-4 py-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium
                       ${p.stock > 10 ? 'bg-green-100 text-green-700' : p.stock > 0 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'}`}>
@@ -184,7 +184,7 @@ export default function AdminProductsPage() {
           <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="p-6 border-b flex items-center justify-between">
               <h2 className="font-bold text-lg">{editing ? 'Editeaza produs' : 'Produs nou'}</h2>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-xl leading-none">вњ•</button>
             </div>
             <div className="p-6 space-y-4">
               <div>
@@ -271,3 +271,4 @@ export default function AdminProductsPage() {
     </div>
   )
 }
+

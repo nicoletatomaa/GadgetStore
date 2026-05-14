@@ -164,7 +164,7 @@ export default function CheckoutPage() {
                 <option value="US">Statele Unite (Tax 8.5%)</option>
                 <option value="Asia">Asia (GST 10%)</option>
               </select>
-              <p className="text-xs text-gray-400 mt-1">Afecteaza calculul taxelor — Abstract Factory pattern</p>
+              <p className="text-xs text-gray-400 mt-1">Afecteaza calculul taxelor - Abstract Factory pattern</p>
             </div>
           </>
         )}
@@ -184,7 +184,7 @@ export default function CheckoutPage() {
                     <p className="text-sm font-medium">{opt.label}</p>
                     <p className="text-xs text-gray-500">{opt.description}</p>
                   </div>
-                  <span className="text-sm font-bold text-gray-700">{opt.cost} RON</span>
+                  <span className="text-sm font-bold text-gray-700">{opt.cost} MDL</span>
                 </label>
               ))}
             </div>
@@ -192,17 +192,17 @@ export default function CheckoutPage() {
               <div className="bg-gray-50 rounded-lg p-3 text-sm space-y-1">
                 <p className="font-medium text-gray-700">Estimare costuri ({form.region})</p>
                 <div className="flex justify-between text-gray-500">
-                  <span>Subtotal</span><span>{subtotal().toFixed(2)} RON</span>
+                  <span>Subtotal</span><span>{subtotal().toFixed(2)} MDL</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
                   <span>Taxa ({(regional.taxRate * 100).toFixed(0)}%)</span>
-                  <span>{regional.taxAmount.toFixed(2)} RON</span>
+                  <span>{regional.taxAmount.toFixed(2)} MDL</span>
                 </div>
                 <div className="flex justify-between text-gray-500">
-                  <span>Livrare {shippingMethod}</span><span>{shippingCost} RON</span>
+                  <span>Livrare {shippingMethod}</span><span>{shippingCost} MDL</span>
                 </div>
                 <div className="flex justify-between font-bold border-t pt-1">
-                  <span>Total estimat</span><span className="text-brand">{totalEstimate.toFixed(2)} RON</span>
+                  <span>Total estimat</span><span className="text-brand">{totalEstimate.toFixed(2)} MDL</span>
                 </div>
               </div>
             )}
@@ -232,7 +232,7 @@ export default function CheckoutPage() {
                   value={form.couponCode ?? ''}
                   onChange={(e) => setForm((p) => ({ ...p, couponCode: e.target.value }))} />
               </div>
-              <p className="text-xs text-gray-400 mt-1">Strategy pattern — discount calculat automat la procesare</p>
+              <p className="text-xs text-gray-400 mt-1">Strategy pattern - discount calculat automat la procesare</p>
             </div>
           </>
         )}
@@ -252,7 +252,7 @@ export default function CheckoutPage() {
                 <p className="font-medium text-gray-700 mb-1">Livrare</p>
                 <p className="text-gray-600">{form.shippingAddress.street}, {form.shippingAddress.city}</p>
                 <p className="text-gray-600">{form.shippingAddress.postalCode}, {form.shippingAddress.country}</p>
-                <p className="text-gray-500">Regiune: {form.region} · {shippingMethod === 'express' ? 'Express (35 RON)' : 'Standard (15 RON)'}</p>
+                <p className="text-gray-500">Regiune: {form.region} &middot; {shippingMethod === 'express' ? 'Express (35 MDL)' : 'Standard (15 MDL)'}</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-3 space-y-1">
                 <p className="font-medium text-gray-700 mb-1">Plata</p>
@@ -263,26 +263,26 @@ export default function CheckoutPage() {
                 <p className="font-medium text-gray-700 mb-2">Produse ({items.length})</p>
                 {items.map((item) => (
                   <div key={item.id} className="flex justify-between text-gray-600">
-                    <span className="truncate flex-1">{item.productName} × {item.quantity}</span>
-                    <span className="ml-2 shrink-0">{(item.finalPrice * item.quantity).toFixed(2)} RON</span>
+                    <span className="truncate flex-1">{item.productName} &times; {item.quantity}</span>
+                    <span className="ml-2 shrink-0">{(item.finalPrice * item.quantity).toFixed(2)} MDL</span>
                   </div>
                 ))}
               </div>
               <div className="border-t pt-3 space-y-1">
                 <div className="flex justify-between text-gray-500">
-                  <span>Subtotal</span><span>{subtotal().toFixed(2)} RON</span>
+                  <span>Subtotal</span><span>{subtotal().toFixed(2)} MDL</span>
                 </div>
                 {regional && (
                   <div className="flex justify-between text-gray-500">
-                    <span>Taxa</span><span>{regional.taxAmount.toFixed(2)} RON</span>
+                    <span>Taxa</span><span>{regional.taxAmount.toFixed(2)} MDL</span>
                   </div>
                 )}
                 <div className="flex justify-between text-gray-500">
-                  <span>Livrare</span><span>{shippingCost} RON</span>
+                  <span>Livrare</span><span>{shippingCost} MDL</span>
                 </div>
                 <div className="flex justify-between font-bold text-base">
                   <span>Total</span>
-                  <span className="text-brand">{totalEstimate.toFixed(2)} RON</span>
+                  <span className="text-brand">{totalEstimate.toFixed(2)} MDL</span>
                 </div>
               </div>
               <textarea className="input w-full mt-2" rows={2} placeholder="Note optionale pentru livrare..."
@@ -296,7 +296,7 @@ export default function CheckoutPage() {
       {/* Navigatie */}
       <div className="flex justify-between">
         <button onClick={() => setStep((s) => s - 1)} disabled={step === 0} className="btn-secondary">
-          ← Inapoi
+          &larr; Inapoi
         </button>
         {step < STEPS.length - 1 ? (
           <button
@@ -304,7 +304,7 @@ export default function CheckoutPage() {
             disabled={!canNext()}
             className="btn-primary disabled:opacity-50"
           >
-            Continua →
+            Continua &rarr;
           </button>
         ) : (
           <button onClick={() => processCheckout()} disabled={isPending} className="btn-primary min-w-40">

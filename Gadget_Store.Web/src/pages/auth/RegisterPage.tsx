@@ -1,4 +1,4 @@
-import { useState } from 'react'
+﻿import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useRegister } from '@/hooks/useAuth'
 
@@ -49,3 +49,4 @@ export default function RegisterPage() {
     </div>
   )
 }
+

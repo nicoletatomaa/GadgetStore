@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom'
+﻿import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ordersService } from '@/services/api'
 
@@ -13,14 +13,14 @@ export default function OrderConfirmPage() {
 
   return (
     <div className="max-w-lg mx-auto text-center py-16 space-y-6">
-      <div className="text-7xl">✅</div>
+      <div className="text-7xl">вњ…</div>
       <h1 className="text-3xl font-bold text-gray-900">Comanda plasata!</h1>
       <p className="text-gray-500">
         Numarul comenzii tale este <span className="font-mono font-bold text-gray-800">{orderId?.slice(0, 8).toUpperCase()}</span>
       </p>
       {order && (
         <div className="card p-4 text-left text-sm space-y-1">
-          <p><span className="text-gray-500">Total:</span> <strong>{order.totalAmount.toFixed(2)} RON</strong></p>
+          <p><span className="text-gray-500">Total:</span> <strong>{order.totalAmount.toFixed(2)} MDL</strong></p>
           <p><span className="text-gray-500">Status:</span> <span className="badge-blue">{order.status}</span></p>
           <p><span className="text-gray-500">Metoda plata:</span> {order.payment?.method}</p>
         </div>
@@ -32,3 +32,4 @@ export default function OrderConfirmPage() {
     </div>
   )
 }
+

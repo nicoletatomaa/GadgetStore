@@ -1,7 +1,7 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import type { AuthResponse } from '@/types'
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000'
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? ''
 
 export const api = axios.create({
   baseURL: BASE_URL,
@@ -70,8 +70,8 @@ api.interceptors.response.use(
     }
 
     try {
-      const { data } = await axios.post<AuthResponse>(
-        `${BASE_URL}/api/auth/refresh`,
+      const { data } = await api.post<AuthResponse>(
+        '/api/auth/refresh',
         { refreshToken }
       )
       localStorage.setItem('accessToken', data.accessToken)

@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+﻿import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { wishlistService } from '@/services/api'
 import { useUiStore } from '@/store/uiStore'
@@ -39,7 +39,7 @@ export default function WishlistPage() {
             <div key={item.id} className="card p-4 space-y-3">
               <Link to={`/products/${item.productId}`} className="block">
                 <p className="font-medium text-gray-800 hover:text-brand">{item.productName}</p>
-                <p className="text-brand font-bold">{item.productPrice.toFixed(2)} RON</p>
+                <p className="text-brand font-bold">{item.productPrice.toFixed(2)} MDL</p>
                 <p className="text-xs text-gray-400">
                   {item.productStock > 0 ? <span className="text-green-600">In stoc</span> : <span className="text-red-500">Stoc epuizat</span>}
                 </p>
@@ -49,14 +49,14 @@ export default function WishlistPage() {
                   className="btn-primary flex-1 text-sm py-1.5">
                   Muta in cos
                 </button>
-                <button onClick={() => remove(item.productId)} className="btn-secondary text-sm py-1.5 px-3">✕</button>
+                <button onClick={() => remove(item.productId)} className="btn-secondary text-sm py-1.5 px-3">вњ•</button>
               </div>
             </div>
           ))}
         </div>
       ) : (
         <div className="text-center py-16 text-gray-500">
-          <p className="text-5xl mb-4">❤️</p>
+          <p className="text-5xl mb-4">вќ¤пёЏ</p>
           <p>Wishlist-ul tau este gol.</p>
           <Link to="/catalog" className="btn-primary inline-flex mt-4">Descopera produse</Link>
         </div>
@@ -64,3 +64,4 @@ export default function WishlistPage() {
     </div>
   )
 }
+

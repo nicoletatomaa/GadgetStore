@@ -1,4 +1,4 @@
-import { useUiStore } from '@/store/uiStore'
+﻿import { useUiStore } from '@/store/uiStore'
 
 const typeClasses = {
   success: 'bg-green-600',
@@ -24,10 +24,11 @@ export default function ToastContainer() {
             onClick={() => removeToast(toast.id)}
             className="shrink-0 opacity-75 hover:opacity-100 transition-opacity"
           >
-            ✕
+            вњ•
           </button>
         </div>
       ))}
     </div>
   )
 }
+

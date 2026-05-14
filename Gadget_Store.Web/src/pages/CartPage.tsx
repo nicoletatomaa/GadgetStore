@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+﻿import { Link } from 'react-router-dom'
 import { useCartStore } from '@/store/cartStore'
 import { useCartQuery, useRemoveFromCart, useUndoCart } from '@/hooks/useCart'
 
@@ -55,7 +55,7 @@ export default function CartPage() {
               <p className="text-sm text-gray-500">Cantitate: {item.quantity}</p>
             </div>
             <div className="text-right shrink-0">
-              <p className="font-bold text-brand">{(item.finalPrice * item.quantity).toFixed(2)} RON</p>
+              <p className="font-bold text-brand">{(item.finalPrice * item.quantity).toFixed(2)} MDL</p>
               <button
                 onClick={() => removeItem(item.id)}
                 className="text-xs text-red-500 hover:text-red-700 mt-1"
@@ -70,7 +70,7 @@ export default function CartPage() {
       <div className="card p-4 space-y-2">
         <div className="flex justify-between text-sm text-gray-600">
           <span>Subtotal</span>
-          <span>{subtotal().toFixed(2)} RON</span>
+          <span>{subtotal().toFixed(2)} MDL</span>
         </div>
         <div className="flex justify-between text-sm text-gray-500">
           <span>Livrare</span>
@@ -78,7 +78,7 @@ export default function CartPage() {
         </div>
         <div className="flex justify-between font-bold text-lg border-t pt-2 mt-2">
           <span>Total estimat</span>
-          <span className="text-brand">{subtotal().toFixed(2)} RON</span>
+          <span className="text-brand">{subtotal().toFixed(2)} MDL</span>
         </div>
         <Link to="/checkout" className="btn-primary w-full mt-4 text-center block">
           Continua spre Checkout
@@ -87,3 +87,4 @@ export default function CartPage() {
     </div>
   )
 }
+

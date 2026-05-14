@@ -63,7 +63,7 @@ export default function AdminOrdersPage() {
         </div>
       ) : orders.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
-          <p className="text-5xl mb-3">📋</p>
+          <p className="text-5xl mb-3">рџ"‹</p>
           <p>Nu exista comenzi inca.</p>
         </div>
       ) : (
@@ -95,7 +95,7 @@ export default function AdminOrdersPage() {
                   <td className="px-4 py-3">
                     <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">{o.region}</span>
                   </td>
-                  <td className="px-4 py-3 font-bold text-brand">{o.totalAmount.toFixed(2)} RON</td>
+                  <td className="px-4 py-3 font-bold text-brand">{o.totalAmount.toFixed(2)} MDL</td>
                   <td className="px-4 py-3">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusBadge[o.status] ?? ''}`}>
                       {o.status}
@@ -129,3 +129,4 @@ export default function AdminOrdersPage() {
     </div>
   )
 }
+
