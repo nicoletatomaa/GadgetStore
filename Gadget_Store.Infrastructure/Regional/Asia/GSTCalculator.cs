@@ -7,5 +7,6 @@ public class GSTCalculator : ITaxCalculator
      private const decimal GSTRate = 0.12m;
 
      public decimal CalculateTax(decimal amount) => Math.Round(amount * GSTRate, 2);
+     public decimal GetTaxRate() => GSTRate;
      public string GetTaxDescription() => "GST Asia (12%)";
 }

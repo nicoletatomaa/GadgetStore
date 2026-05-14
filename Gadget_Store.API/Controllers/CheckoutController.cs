@@ -122,11 +122,11 @@ public class CheckoutController : ControllerBase
             subtotal,
             discountAmount,
             taxAmount,
-            taxRate     = taxCalc.GetTaxDescription(),
+            taxRate        = taxCalc.GetTaxRate(),
             shippingCost,
-            shippingMethod  = shipping.GetProviderName(),
-            totalAmount     = subtotal - discountAmount + taxAmount + shippingCost,
-            region          = req.Region,
+            shippingMethod = shipping.GetProviderName(),
+            totalAmount    = subtotal - discountAmount + taxAmount + shippingCost,
+            region         = req.Region,
         });
     }
 
@@ -173,7 +173,7 @@ public class CheckoutController : ControllerBase
 
         var subtotal     = cartItems.Sum(ci => (ci.Product?.Price ?? 0) * ci.Quantity);
         var taxAmount    = taxCalc.CalculateTax(subtotal);
-        var shippingCost = shippingProv.GetShippingCost(subtotal);
+        var shippingCost = req.ShippingCost ?? shippingProv.GetShippingCost(subtotal);
 
         // ── Strategy — discount ───────────────────────────────────────────────
         decimal discountAmount = 0;
@@ -247,6 +247,17 @@ public class CheckoutController : ControllerBase
         {
             usedCoupon.IncrementUsage();
             await _coupons.UpdateAsync(usedCoupon);
+        }
+
+        // ── Decrementeaza stocul pentru fiecare produs cumparat ───────────────
+        foreach (var ci in cartItems)
+        {
+            var product = await _products.GetByIdAsync(ci.ProductId);
+            if (product is null) continue;
+
+            var newStock = Math.Max(0, product.Stock - ci.Quantity);
+            product.UpdateStock(newStock);
+            await _products.UpdateAsync(product);
         }
 
         // Goleste cosul dupa checkout reusit

@@ -1,4 +1,4 @@
-﻿import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link } from 'react-router-dom'
 import { wishlistService } from '@/services/api'
 import { useUiStore } from '@/store/uiStore'
@@ -13,12 +13,12 @@ export default function WishlistPage() {
   })
 
   const { mutate: remove } = useMutation({
-    mutationFn: (productId: number) => wishlistService.remove(productId),
+    mutationFn: (productId: string) => wishlistService.remove(productId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['wishlist'] }),
   })
 
   const { mutate: moveToCart } = useMutation({
-    mutationFn: (productId: number) => wishlistService.moveToCart(productId),
+    mutationFn: (productId: string) => wishlistService.moveToCart(productId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['wishlist'] })
       queryClient.invalidateQueries({ queryKey: ['cart'] })
@@ -49,14 +49,14 @@ export default function WishlistPage() {
                   className="btn-primary flex-1 text-sm py-1.5">
                   Muta in cos
                 </button>
-                <button onClick={() => remove(item.productId)} className="btn-secondary text-sm py-1.5 px-3">вњ•</button>
+                <button onClick={() => remove(item.productId)} className="btn-secondary text-sm py-1.5 px-3">✕</button>
               </div>
             </div>
           ))}
         </div>
       ) : (
         <div className="text-center py-16 text-gray-500">
-          <p className="text-5xl mb-4">вќ¤пёЏ</p>
+          <p className="text-5xl mb-4">❤️</p>
           <p>Wishlist-ul tau este gol.</p>
           <Link to="/catalog" className="btn-primary inline-flex mt-4">Descopera produse</Link>
         </div>
@@ -64,4 +64,3 @@ export default function WishlistPage() {
     </div>
   )
 }
-

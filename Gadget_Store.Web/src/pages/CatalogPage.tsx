@@ -5,6 +5,16 @@ import { productsService, catalogService } from '@/services/api'
 import { useAddToCart } from '@/hooks/useCart'
 import type { ProductFilters } from '@/types'
 
+function ProductImage({ imageUrl, type, name }: { imageUrl?: string; type: string; name: string }) {
+  const [broken, setBroken] = useState(false)
+  const fallback = type === 'Electronics' ? '📱' : '🎧'
+  if (imageUrl && !broken) {
+    return <img src={imageUrl} alt={name} className="w-full h-full object-contain p-2"
+      onError={() => setBroken(true)} />
+  }
+  return <span className="text-4xl">{fallback}</span>
+}
+
 const SORT_OPTIONS = [
   { value: 'popular',   label: 'Popularitate' },
   { value: 'newest',    label: 'Cele mai noi' },
@@ -218,8 +228,8 @@ export default function CatalogPage() {
             {data.items.map((product) => (
               <div key={product.id} className="card p-4 group flex flex-col">
                 <Link to={`/products/${product.id}`} className="flex-1">
-                  <div className="bg-gray-100 rounded-lg h-40 flex items-center justify-center mb-3 text-4xl group-hover:bg-gray-200 transition-colors">
-                    {product.type === 'Electronics' ? '📱' : '🎧'}
+                  <div className="bg-gray-100 rounded-lg h-40 flex items-center justify-center mb-3 overflow-hidden group-hover:bg-gray-200 transition-colors">
+                    <ProductImage imageUrl={product.imageUrl} type={product.type} name={product.name} />
                   </div>
                   <p className="text-sm font-medium text-gray-800 group-hover:text-brand line-clamp-2">{product.name}</p>
                   <p className="text-xs text-gray-400 mt-0.5">{product.brand}</p>

@@ -1,4 +1,5 @@
-﻿using GadgetStore.Patterns.Structural.Composite;
+﻿using GadgetStore.Application.Interfaces;
+using GadgetStore.Patterns.Structural.Composite;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GadgetStore.API.Controllers;
@@ -7,11 +8,13 @@ namespace GadgetStore.API.Controllers;
 [Route("api/[controller]")]
 public class CatalogController : ControllerBase
 {
-    private readonly ICatalogComponent _catalog;
+    private readonly ICatalogComponent  _catalog;
+    private readonly ICategoryRepository _categories;
 
-    public CatalogController(ICatalogComponent catalog)
+    public CatalogController(ICatalogComponent catalog, ICategoryRepository categories)
     {
-        _catalog = catalog;
+        _catalog    = catalog;
+        _categories = categories;
     }
 
     [HttpGet]
@@ -24,6 +27,19 @@ public class CatalogController : ControllerBase
     public IActionResult DisplayCatalog()
     {
         return Ok(new { tree = _catalog.Display() });
+    }
+
+    // Categorii din BD cu ID-uri reale — folosit de admin pentru dropdown
+    [HttpGet("categories")]
+    public async Task<IActionResult> GetCategories()
+    {
+        var cats = await _categories.GetRootCategoriesAsync();
+        return Ok(cats.Select(c => new
+        {
+            c.Id,
+            c.Name,
+            children = c.SubCategories.Select(s => new { s.Id, s.Name })
+        }));
     }
 
     private static object BuildNode(ICatalogComponent component)

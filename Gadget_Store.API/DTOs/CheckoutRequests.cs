@@ -25,6 +25,7 @@ public class FrontendCheckoutRequest
     public string     Region          { get; set; } = "EU";
     public string?    CouponCode      { get; set; }
     public string?    Notes           { get; set; }
+    public decimal?   ShippingCost    { get; set; }  // cost ales de user (standard/express)
 }
 
 public class AddressDto

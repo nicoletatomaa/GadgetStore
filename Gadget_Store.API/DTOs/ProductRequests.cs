@@ -9,7 +9,7 @@ public class CreateProductRequest
     [Required]                 public int Stock            { get; set; }
     [Required, MaxLength(100)] public string Brand         { get; set; } = string.Empty;
     [Required]                 public string Type          { get; set; } = "Electronics"; // Electronics | Accessory
-    [Required]                 public int CategoryId       { get; set; }
+                               public int? CategoryId      { get; set; }
     [MaxLength(500)]           public string? ImageUrl     { get; set; }
                                public string? Description  { get; set; }
 }

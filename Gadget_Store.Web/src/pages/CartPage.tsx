@@ -6,7 +6,7 @@ export default function CartPage() {
   const { isLoading } = useCartQuery()
   const { items, subtotal, canUndo } = useCartStore()
   const { mutate: removeItem, isPending: removing } = useRemoveFromCart()
-  const { mutate: undoCart, isPending: undoing } = useUndoCart()
+  const { mutate: undoCart,   isPending: undoing  } = useUndoCart()
 
   if (isLoading) {
     return (
@@ -35,7 +35,7 @@ export default function CartPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Cosul meu</h1>
         {canUndo && (
-          <button onClick={() => undoCart()} className="btn-secondary text-sm flex items-center gap-1">
+          <button onClick={() => undoCart()} disabled={undoing} className="btn-secondary text-sm flex items-center gap-1 disabled:opacity-50">
             ↩ Anuleaza ultima actiune
           </button>
         )}
@@ -58,7 +58,8 @@ export default function CartPage() {
               <p className="font-bold text-brand">{(item.finalPrice * item.quantity).toFixed(2)} MDL</p>
               <button
                 onClick={() => removeItem(item.id)}
-                className="text-xs text-red-500 hover:text-red-700 mt-1"
+                disabled={removing}
+                className="text-xs text-red-500 hover:text-red-700 mt-1 disabled:opacity-50"
               >
                 Elimina
               </button>

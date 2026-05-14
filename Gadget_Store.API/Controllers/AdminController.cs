@@ -105,6 +105,7 @@ public class AdminController : ControllerBase
         [FromQuery] int pageSize = 20)
     {
         var orders = await _orders.GetAllAsync(page, pageSize);
+        var total  = await _orders.CountAsync();
 
         var report = orders.Select(o => new
         {
@@ -125,7 +126,7 @@ public class AdminController : ControllerBase
             Page     = page,
             PageSize = pageSize,
             Data     = report,
-            Total    = orders.Count()
+            Total    = total
         });
     }
 }

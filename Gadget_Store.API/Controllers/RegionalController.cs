@@ -50,4 +50,32 @@ public class RegionalController : ControllerBase
                grandTotal = request.Amount + tax + shippingCost
           });
      }
+
+     /// <summary>
+     /// Calculeaza taxe si transport — raspuns aplatizat pentru frontend.
+     /// Shape: { taxAmount, taxRate, shippingCost, shippingMethod, total }
+     /// </summary>
+     [HttpPost("{region}/calculate")]
+     public IActionResult Calculate(string region, [FromBody] RegionalSummaryRequest request)
+     {
+          var factory = _serviceProvider.GetKeyedService<IRegionalFactory>(region);
+          if (factory is null)
+               return BadRequest(new { message = $"Regiune invalida: {region}. Valori acceptate: EU, US, Asia" });
+
+          var taxCalc      = factory.CreateTaxCalculator();
+          var shipping     = factory.CreateShippingProvider();
+          var taxAmount    = taxCalc.CalculateTax(request.Amount);
+          var shippingCost = shipping.GetShippingCost(request.Amount);
+
+          return Ok(new
+          {
+               region,
+               subtotal       = request.Amount,
+               taxAmount,
+               taxRate        = taxCalc.GetTaxRate(),
+               shippingCost,
+               shippingMethod = shipping.GetProviderName(),
+               total          = request.Amount + taxAmount + shippingCost,
+          });
+     }
 }

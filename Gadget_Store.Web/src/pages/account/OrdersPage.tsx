@@ -40,7 +40,7 @@ export default function OrdersPage() {
         </div>
       ) : (
         <div className="text-center py-16 text-gray-500">
-          <p className="text-5xl mb-4">рџ"­</p>
+          <p className="text-5xl mb-4">📭</p>
           <p>Nu ai plasate comenzi inca.</p>
           <Link to="/catalog" className="btn-primary inline-flex mt-4">Incepe cumparaturile</Link>
         </div>
@@ -48,4 +48,3 @@ export default function OrdersPage() {
     </div>
   )
 }
-

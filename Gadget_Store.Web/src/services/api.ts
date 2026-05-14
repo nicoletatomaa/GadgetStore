@@ -156,9 +156,26 @@ export const productsService = {
 
 import type { Category } from '@/types'
 
+function toArray<T>(val: any): T[] {
+  if (Array.isArray(val)) return val
+  if (val && Array.isArray(val.$values)) return val.$values
+  return []
+}
+
+function normalizeCategoryTree(cats: any[]): Category[] {
+  return cats.map((c) => ({
+    ...c,
+    children: toArray(c.children),
+  }))
+}
+
 export const catalogService = {
   getTree: () =>
-    api.get<Category[]>('/api/catalog').then((r) => r.data),
+    api.get('/api/catalog').then((r) => normalizeCategoryTree(toArray(r.data))),
+
+  getCategories: () =>
+    api.get<{ id: number; name: string; children: { id: number; name: string }[] }[]>('/api/catalog/categories')
+       .then((r) => toArray<{ id: number; name: string; children: { id: number; name: string }[] }>(r.data)),
 
   getProductsByCategory: (categoryId: number, filters?: ProductFilters) =>
     api.get<PagedResult<Product>>(`/api/catalog/${categoryId}/products`, { params: filters })

@@ -1,0 +1,341 @@
+================================================================================
+  GADGET STORE — GHID COMPLET DE TESTARE MANUALA
+================================================================================
+
+PREGATIRE
+---------
+1. Porneste backend-ul:  cd Gadget_Store.API  ->  dotnet run
+2. Porneste frontend-ul: cd Gadget_Store.Web  ->  npm run dev
+3. Deschide browserul la http://localhost:5173
+4. Ai nevoie de 2 conturi: unul Customer (inregistrat nou) si unul Admin
+   (creat prin seed sau schimbat rol din BD)
+
+
+================================================================================
+BLOC 1 — AUTENTIFICARE
+================================================================================
+
+[ ] 1.1  Inregistrare cont nou
+         - Mergi la /register
+         - Completeaza: firstName, lastName, email, parola (min 8 car.)
+         - Apasa "Inregistreaza-te"
+         - Asteptat: redirectat la /  , badge "Customer" vizibil in header
+
+[ ] 1.2  Login cu date corecte
+         - Delogheaza-te (daca esti autentificat)
+         - Mergi la /login
+         - Introdu email + parola corecte
+         - Asteptat: redirectat la / , numele userului apare in header
+
+[ ] 1.3  Login cu date gresite
+         - Introdu parola gresita
+         - Asteptat: mesaj de eroare toast, ramai pe /login
+
+[ ] 1.4  Redirect GuestOnly
+         - Fiind autentificat, acceseaza manual /login sau /register
+         - Asteptat: redirectat automat la /
+
+[ ] 1.5  Delogare
+         - Apasa butonul de logout din header
+         - Asteptat: token sters, redirectat la / , header arata "Login"
+
+
+================================================================================
+BLOC 2 — CATALOG SI NAVIGARE
+================================================================================
+
+[ ] 2.1  Pagina principala (HomePage)
+         - Verifica ca se incarca produse featured
+         - Verifica ca sectiunile (bannere, categorii) sunt vizibile
+
+[ ] 2.2  Catalog — listare produse
+         - Mergi la /catalog
+         - Verifica ca produsele se incarca in grid
+
+[ ] 2.3  Filtrare dupa pret
+         - Seteaza Pret min / Pret max
+         - Verifica ca lista se filtreaza corect
+
+[ ] 2.4  Filtrare "Doar in stoc"
+         - Bifa checkbox "In stoc"
+         - Verifica ca dispar produsele cu stoc 0
+
+[ ] 2.5  Sortare
+         - Schimba dropdown sortare: Populare / Noi / Pret crescator / Pret descrescator
+         - Verifica ordinea listei dupa fiecare optiune
+
+[ ] 2.6  Navigare categorii
+         - Click pe o categorie din sidebar
+         - Verifica ca se filtreaza produsele
+         - Testeaza si subcategorii (Composite pattern)
+
+[ ] 2.7  Paginare
+         - Daca sunt >12 produse, verifica ca apar butoanele de paginare
+         - Testeaza Next, Prev, click pe numar de pagina
+         - Testeaza ellipsis (...)
+
+[ ] 2.8  Pagina 404
+         - Acceseaza o ruta inexistenta ex: /xyz123
+         - Asteptat: pagina NotFound cu link inapoi acasa
+
+
+================================================================================
+BLOC 3 — PAGINA PRODUS
+================================================================================
+
+[ ] 3.1  Detalii produs
+         - Click pe un produs din catalog
+         - Verifica: imagine, nume, pret, descriere, stoc
+
+[ ] 3.2  Optiuni Decorator (Warranty / Gift Wrap / Insurance)
+         - Bifeaza optiuni suplimentare
+         - Verifica ca pretul total se actualizeaza dinamic
+
+[ ] 3.3  Adauga in cos
+         - Apasa "Adauga in cos"
+         - Verifica badge-ul din header (+1)
+         - Toast de confirmare vizibil
+
+[ ] 3.4  Adauga in Wishlist (necesita autentificare)
+         - Apasa butonul Wishlist (inima)
+         - Asteptat: toast confirmare, produsul apare la /account/wishlist
+
+[ ] 3.5  Recenzii — vizualizare
+         - Click pe tab "Recenzii"
+         - Verifica ca recenziile existente se afiseaza cu rating stele
+
+[ ] 3.6  Adauga recenzie (necesita autentificare)
+         - Selecteaza rating (1-5 stele)
+         - Scrie un comentariu
+         - Apasa "Trimite recenzia"
+         - Asteptat: recenzia apare in lista
+
+
+================================================================================
+BLOC 4 — COS DE CUMPARATURI
+================================================================================
+
+[ ] 4.1  Vizualizare cos
+         - Mergi la /cart
+         - Verifica: lista produse, cantitati, preturi, subtotal
+
+[ ] 4.2  Loading skeleton
+         - La prima incarcare (refresh pagina) verifica animatia skeleton
+           inainte sa apara produsele
+
+[ ] 4.3  Stergere produs din cos
+         - Apasa butonul "Sterge" pe un produs
+         - Verifica ca dispare din lista si subtotalul se recalculeaza
+
+[ ] 4.4  Undo (Command pattern)
+         - Dupa stergere, apasa butonul "Undo"
+         - Asteptat: produsul reapare in cos
+         - Verifica ca butonul Undo dispare daca nu mai e nimic de anulat
+
+[ ] 4.5  Cos gol
+         - Sterge toate produsele
+         - Asteptat: mesaj "Cosul tau este gol" + link spre catalog
+
+[ ] 4.6  Link spre Checkout
+         - Cu produse in cos, apasa "Continua spre checkout"
+         - Asteptat: redirectat la /checkout (sau /login daca nu esti autentificat)
+
+
+================================================================================
+BLOC 5 — CHECKOUT (wizard 5 pasi)
+================================================================================
+
+[ ] 5.1  Pas 1 — Contact
+         - Verifica ca datele din profil sunt pre-completate
+         - Testeaza validare: lasa firstName gol -> butonul "Continua" dezactivat
+         - Completeaza toate campurile obligatorii (*)
+
+[ ] 5.2  Pas 2 — Adresa
+         - Completeaza strada, oras, cod postal
+         - Testeaza validare: lasa strada goala -> "Continua" dezactivat
+         - Schimba Regiune fiscala (EU / US / Asia) si verifica ca se salveaza
+
+[ ] 5.3  Pas 3 — Livrare
+         - Selecteaza Standard (15 MDL) si verifica estimarea costurilor
+         - Selecteaza Express (35 MDL) si verifica ca totalul se actualizeaza
+         - Verifica ca taxa regionala apare corect (Abstract Factory)
+
+[ ] 5.4  Pas 4 — Plata
+         - Testeaza selectia fiecarei metode: Card / PayPal / Stripe / Crypto
+         - Introdu un cod promotional valid (ex: SUMMER20) si verifica acceptarea
+         - Lasa campul gol si verifica ca merge mai departe
+
+[ ] 5.5  Pas 5 — Review
+         - Verifica ca toate datele introduse apar corect in sumar
+         - Verifica totalul final (subtotal + taxa + livrare)
+         - Adauga o nota optionala
+
+[ ] 5.6  Plasare comanda
+         - Apasa "Plaseaza comanda"
+         - Asteptat: redirectat la /checkout/confirm/{orderId}
+         - Cosul trebuie sa fie gol dupa confirmare
+
+[ ] 5.7  Navigatie inapoi
+         - Testeaza butonul "Inapoi" in fiecare pas
+         - Verifica ca datele introduse se pastreaza
+
+
+================================================================================
+BLOC 6 — CONTUL MEUS
+================================================================================
+
+[ ] 6.1  Profil — vizualizare
+         - Mergi la /account/profile
+         - Verifica: initiale avatar, nume, email, rol (badge)
+
+[ ] 6.2  Editare profil
+         - Apasa "Editeaza"
+         - Modifica firstName si/sau lastName
+         - Apasa "Salveaza"
+         - Asteptat: toast succes, header se actualizeaza cu noul nume
+
+[ ] 6.3  Schimbare parola
+         - Click pe cardul "Schimba parola"
+         - Introdu parola curenta corecta + parola noua (min 8 car.)
+         - Introdu confirmare gresita -> mesaj "Parolele nu coincid"
+         - Introdu confirmare corecta -> apasa "Schimba parola"
+         - Asteptat: toast succes
+         - Verifica: poti face login cu parola noua
+
+[ ] 6.4  Navigare rapida din profil
+         - Click pe "Comenzile mele" -> mergi la /account/orders
+         - Click pe "Wishlist" -> mergi la /account/wishlist
+
+[ ] 6.5  Lista comenzi
+         - Mergi la /account/orders
+         - Verifica ca apare comanda plasata la Bloc 5
+         - Verifica: data, total, status
+
+[ ] 6.6  Detaliu comanda
+         - Click pe o comanda
+         - Verifica: produse, adresa livrare, metoda plata, total detaliat
+
+[ ] 6.7  Wishlist
+         - Mergi la /account/wishlist
+         - Verifica produsele adaugate la Bloc 3.4
+         - Apasa "Muta in cos" -> produsul trebuie sa apara in cart
+         - Apasa "Sterge" -> produsul dispare din wishlist
+
+
+================================================================================
+BLOC 7 — ADMIN PANEL (necesita cont cu rol Admin)
+================================================================================
+
+[ ] 7.1  Acces protejat
+         - Cu cont Customer, acceseaza manual /admin
+         - Asteptat: redirectat (403 sau /)
+
+[ ] 7.2  Dashboard
+         - Logheaza-te cu cont Admin si mergi la /admin
+         - Verifica cele 4 carduri: Vanzari azi, Comenzi noi, Stoc critic, Utilizatori noi
+         - Verifica link-urile rapide spre Produse / Comenzi / Utilizatori
+
+[ ] 7.3  Gestionare produse — listare
+         - Mergi la /admin/products
+         - Verifica ca produsele apar in tabel cu imagine, pret, stoc
+
+[ ] 7.4  Cautare produs
+         - Scrie in search bar un nume de produs
+         - Verifica ca lista se filtreaza
+
+[ ] 7.5  Creare produs nou
+         - Apasa "Produs nou"
+         - Completeaza: nume, descriere, pret, stoc, categorie
+         - Salveaza -> produsul trebuie sa apara in lista si in catalog
+
+[ ] 7.6  Editare produs
+         - Click pe iconita edit la un produs
+         - Modifica pretul
+         - Salveaza -> verifica ca pretul nou apare in catalog
+
+[ ] 7.7  Stergere produs
+         - Click pe iconita stergere
+         - Confirma dialogul
+         - Verifica ca produsul dispare din lista
+
+[ ] 7.8  Gestionare comenzi
+         - Mergi la /admin/orders
+         - Verifica ca apar toate comenzile
+
+[ ] 7.9  Schimbare status comanda
+         - Pe o comanda cu status "Pending", schimba la "Processing"
+         - Verifica ca se actualizeaza in lista
+         - Testeaza toate statusurile: Pending -> Processing -> Shipped -> Delivered
+
+[ ] 7.10 Gestionare utilizatori
+         - Mergi la /admin/users
+         - Verifica ca apare lista de useri cu email si rol
+
+[ ] 7.11 Cautare utilizator
+         - Cauta dupa email
+         - Verifica filtrarea
+
+[ ] 7.12 Schimbare rol utilizator
+         - Pe un user Customer, schimba rolul la Admin
+         - Verifica ca se actualizeaza in lista
+         - Schimba inapoi la Customer
+
+
+================================================================================
+BLOC 8 — SECURITATE SI EDGE CASES
+================================================================================
+
+[ ] 8.1  Rute protejate fara autentificare
+         - Delogheaza-te
+         - Acceseaza /cart, /checkout, /account/profile, /account/orders
+         - Asteptat: redirectat la /login
+
+[ ] 8.2  Refresh token
+         - Autentifica-te, asteapta sau simuleaza expirare access token
+         - Fa o actiune (ex: adauga in cos)
+         - Asteptat: tokenul se reimprospateza automat, actiunea reuseste
+
+[ ] 8.3  Cos persistent
+         - Adauga produse in cos
+         - Inchide si redeschide browserul
+         - Verifica ca produsele sunt inca in cos (sincronizare cu server)
+
+[ ] 8.4  Stoc insuficient
+         - Incearca sa adaugi in cos mai mult decat stocul disponibil
+         - Asteptat: eroare sau limitare cantitate
+
+[ ] 8.5  Checkout cu cos gol
+         - Goleste cosul, apoi incearca sa accesezi /checkout direct
+         - Asteptat: redirectat inapoi la catalog sau mesaj de eroare
+
+[ ] 8.6  Toast notifications
+         - Verifica ca toast-urile apar si dispar automat dupa ~4 secunde
+         - Testeaza toast succes (verde), eroare (rosu), info (albastru)
+
+[ ] 8.7  Responsive / mobil
+         - Redimensioneaza fereastra la latime mica (<768px)
+         - Verifica meniu hamburger in header
+         - Verifica ca grid-urile (catalog, dashboard) se pliaza corect
+
+
+================================================================================
+ORDINE RECOMANDATA PENTRU TESTARE COMPLETA
+================================================================================
+
+  1. Inregistrare cont nou (1.1)
+  2. Browse catalog + filtre (2.2 - 2.7)
+  3. Pagina produs + decorator + add to cart (3.1 - 3.3)
+  4. Wishlist (3.4)
+  5. Recenzie (3.5 - 3.6)
+  6. Cart: undo, stergere (4.1 - 4.5)
+  7. Checkout complet (5.1 - 5.6)
+  8. Profil: editare + parola (6.1 - 6.3)
+  9. Comenzi + wishlist din cont (6.5 - 6.7)
+ 10. Login ca Admin
+ 11. Dashboard (7.2)
+ 12. CRUD produse (7.3 - 7.7)
+ 13. Comenzi admin (7.8 - 7.9)
+ 14. Utilizatori admin (7.10 - 7.12)
+ 15. Edge cases (8.1 - 8.7)
+
+================================================================================

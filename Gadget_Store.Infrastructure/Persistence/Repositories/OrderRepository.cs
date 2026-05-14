@@ -34,4 +34,7 @@ public class OrderRepository : BaseRepository<Order>, IOrderRepository
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
+
+    public async Task<int> CountAsync() =>
+        await Context.Orders.CountAsync();
 }

@@ -33,14 +33,29 @@ public class ProductsController : ControllerBase
         [FromQuery] int     page       = 1,
         [FromQuery] int     pageSize   = 20)
     {
+        bool hasInMemoryFilters = minPrice.HasValue || maxPrice.HasValue || inStock == true;
+
         IEnumerable<Product> products;
 
-        if (!string.IsNullOrWhiteSpace(search))
-            products = await _products.SearchAsync(search, page, pageSize);
-        else if (categoryId.HasValue)
-            products = await _products.GetByCategoryAsync(categoryId.Value, page, pageSize);
+        if (hasInMemoryFilters)
+        {
+            // Incarca toate produsele din scope pentru filtrare + paginare corecta in memorie
+            if (!string.IsNullOrWhiteSpace(search))
+                products = await _products.SearchAsync(search, 1, 10_000);
+            else if (categoryId.HasValue)
+                products = await _products.GetByCategoryAsync(categoryId.Value, 1, 10_000);
+            else
+                products = await _products.GetAllAsync(1, 10_000);
+        }
         else
-            products = await _products.GetAllAsync(page, pageSize);
+        {
+            if (!string.IsNullOrWhiteSpace(search))
+                products = await _products.SearchAsync(search, page, pageSize);
+            else if (categoryId.HasValue)
+                products = await _products.GetByCategoryAsync(categoryId.Value, page, pageSize);
+            else
+                products = await _products.GetAllAsync(page, pageSize);
+        }
 
         var query = products.AsQueryable();
 
@@ -56,8 +71,20 @@ public class ProductsController : ControllerBase
             _            => query.OrderBy(p => p.Name),
         };
 
-        var items = query.ToList();
-        var total = await _products.CountAsync();
+        int total;
+        List<Product> items;
+
+        if (hasInMemoryFilters)
+        {
+            var allFiltered = query.ToList();
+            total = allFiltered.Count;
+            items = allFiltered.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        }
+        else
+        {
+            items = query.ToList();
+            total = await _products.CountAsync();
+        }
 
         return Ok(new
         {
@@ -90,7 +117,7 @@ public class ProductsController : ControllerBase
             ? new AccessoryProduct(req.Name, req.Price, req.Stock, req.Brand)
             : new ElectronicsProduct(req.Name, req.Price, req.Stock, req.Brand);
 
-        product.CategoryId  = req.CategoryId;
+        if (req.CategoryId.HasValue) product.CategoryId = req.CategoryId.Value;
         product.ImageUrl    = req.ImageUrl;
         product.Description = req.Description;
 

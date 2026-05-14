@@ -7,5 +7,6 @@ public class VATCalculator : ITaxCalculator
      private const decimal VATRate = 0.19m;
 
      public decimal CalculateTax(decimal amount) => Math.Round(amount * VATRate, 2);
+     public decimal GetTaxRate() => VATRate;
      public string GetTaxDescription() => "TVA Europa (19%)";
 }

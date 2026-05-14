@@ -3,5 +3,6 @@
 public interface ITaxCalculator
 {
      decimal CalculateTax(decimal amount);
+     decimal GetTaxRate();
      string GetTaxDescription();
 }

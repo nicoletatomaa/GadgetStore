@@ -1,4 +1,4 @@
-﻿import { useParams, Link } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ordersService } from '@/services/api'
 
@@ -16,7 +16,7 @@ export default function OrderDetailPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="flex items-center gap-3">
-        <Link to="/account/orders" className="text-gray-400 hover:text-gray-600">в†ђ Comenzile mele</Link>
+        <Link to="/account/orders" className="text-gray-400 hover:text-gray-600">&larr; Comenzile mele</Link>
       </div>
       <h1 className="text-xl font-bold">Comanda #{order.id.slice(0,8).toUpperCase()}</h1>
       <div className="card p-4 space-y-2 text-sm">
@@ -29,7 +29,7 @@ export default function OrderDetailPage() {
         <h2 className="font-semibold">Produse</h2>
         {order.items.map((item) => (
           <div key={item.id} className="flex justify-between text-sm">
-            <span>{item.productName} Г— {item.quantity}</span>
+            <span>{item.productName} &times; {item.quantity}</span>
             <span className="font-medium">{(item.finalPrice * item.quantity).toFixed(2)} MDL</span>
           </div>
         ))}
@@ -44,4 +44,3 @@ export default function OrderDetailPage() {
     </div>
   )
 }
-

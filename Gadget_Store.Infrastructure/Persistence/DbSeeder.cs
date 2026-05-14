@@ -34,7 +34,7 @@ public static class DbSeeder
         {
             CategoryId   = phones.Id,
             Description  = "Cel mai avansat iPhone cu chip A18 Pro, camera 48MP si ecran ProMotion 6.3\"",
-            ImageUrl     = "/images/iphone16pro.jpg",
+            ImageUrl     = "https://picsum.photos/seed/iphone16pro/400/400",
             IsTemplate   = true,
             TemplateName = "iphone-template",
             IsActive     = true
@@ -45,7 +45,7 @@ public static class DbSeeder
         {
             CategoryId  = phones.Id,
             Description = "iPhone 15 cu chip A16 Bionic, Dynamic Island si camera 48MP",
-            ImageUrl    = "/images/iphone15.jpg",
+            ImageUrl    = "https://picsum.photos/seed/iphone15/400/400",
             IsActive    = true
         };
         iphone15.Tags.AddRange(new[] { "smartphone", "apple", "5G" });
@@ -54,7 +54,7 @@ public static class DbSeeder
         {
             CategoryId  = phones.Id,
             Description = "Samsung Galaxy S24 Ultra cu S Pen, camera 200MP si ecran 6.8\"",
-            ImageUrl    = "/images/galaxy-s24-ultra.jpg",
+            ImageUrl    = "https://picsum.photos/seed/galaxys24/400/400",
             IsActive    = true
         };
         galaxyS24.Tags.AddRange(new[] { "smartphone", "samsung", "android", "5G" });
@@ -63,7 +63,7 @@ public static class DbSeeder
         {
             CategoryId   = laptops.Id,
             Description  = "MacBook Pro cu chip M4 Pro, 24GB RAM, 512GB SSD, ecran Liquid Retina XDR",
-            ImageUrl     = "/images/macbook-pro-m4.jpg",
+            ImageUrl     = "https://picsum.photos/seed/macbookpro/400/400",
             IsTemplate   = true,
             TemplateName = "macbook-template",
             IsActive     = true
@@ -74,7 +74,7 @@ public static class DbSeeder
         {
             CategoryId  = laptops.Id,
             Description = "Dell XPS 15 cu Intel Core i7-13700H, RTX 4060, 32GB RAM, display OLED 3.5K",
-            ImageUrl    = "/images/dell-xps-15.jpg",
+            ImageUrl    = "https://picsum.photos/seed/dellxps/400/400",
             IsActive    = true
         };
         dellXps.Tags.AddRange(new[] { "laptop", "dell", "windows", "gaming" });
@@ -83,7 +83,7 @@ public static class DbSeeder
         {
             CategoryId   = audio.Id,
             Description  = "AirPods Pro cu Active Noise Cancellation, Transparency mode si Adaptive Audio",
-            ImageUrl     = "/images/airpods-pro.jpg",
+            ImageUrl     = "https://picsum.photos/seed/airpodspro/400/400",
             IsTemplate   = true,
             TemplateName = "airpods-template",
             IsActive     = true
@@ -94,7 +94,7 @@ public static class DbSeeder
         {
             CategoryId  = audio.Id,
             Description = "Casti over-ear Sony cu cele mai bune ANC din industrie si 30h autonomie",
-            ImageUrl    = "/images/sony-wh1000xm5.jpg",
+            ImageUrl    = "https://picsum.photos/seed/sonywh1000/400/400",
             IsActive    = true
         };
         sonyWH1000.Tags.AddRange(new[] { "audio", "wireless", "sony", "ANC", "premium" });
@@ -103,7 +103,7 @@ public static class DbSeeder
         {
             CategoryId  = chargers.Id,
             Description = "Hub USB-C cu HDMI 4K, 3x USB-A, USB-C PD 100W, SD card reader",
-            ImageUrl    = "/images/anker-hub.jpg",
+            ImageUrl    = "https://picsum.photos/seed/ankerhub/400/400",
             IsActive    = true
         };
         usbcHub.Tags.AddRange(new[] { "hub", "usb-c", "anker", "accessory" });
@@ -112,7 +112,7 @@ public static class DbSeeder
         {
             CategoryId  = wearables.Id,
             Description = "Apple Watch Series 10 cu ecran mai mare, detectie fibrilatie atriala si GPS",
-            ImageUrl    = "/images/apple-watch-10.jpg",
+            ImageUrl    = "https://picsum.photos/seed/applewatch/400/400",
             IsActive    = true
         };
         appleWatch.Tags.AddRange(new[] { "smartwatch", "apple", "fitness", "wearable" });

@@ -54,8 +54,14 @@ export default function CheckoutPage() {
     enabled:  step >= 2,
   })
 
+  const { data: summary } = useQuery({
+    queryKey: ['checkout-summary', form.region, form.couponCode, subtotal()],
+    queryFn:  () => checkoutService.getSummary({ ...form, shippingCost }),
+    enabled:  step === 4,
+  })
+
   const { mutate: processCheckout, isPending } = useMutation({
-    mutationFn: () => checkoutService.process(form),
+    mutationFn: () => checkoutService.process({ ...form, shippingCost }),
     onSuccess: (result) => {
       if (result.success && result.orderId) {
         clearCart()
@@ -160,9 +166,9 @@ export default function CheckoutPage() {
               <label className="block text-sm text-gray-600 mb-1">Regiune fiscala</label>
               <select className="input" value={form.region}
                 onChange={(e) => setForm((p) => ({ ...p, region: e.target.value as Region }))}>
-                <option value="EU">Europa (TVA 21%)</option>
+                <option value="EU">Europa (TVA 19%)</option>
                 <option value="US">Statele Unite (Tax 8.5%)</option>
-                <option value="Asia">Asia (GST 10%)</option>
+                <option value="Asia">Asia (GST 12%)</option>
               </select>
               <p className="text-xs text-gray-400 mt-1">Afecteaza calculul taxelor - Abstract Factory pattern</p>
             </div>
@@ -270,19 +276,24 @@ export default function CheckoutPage() {
               </div>
               <div className="border-t pt-3 space-y-1">
                 <div className="flex justify-between text-gray-500">
-                  <span>Subtotal</span><span>{subtotal().toFixed(2)} MDL</span>
+                  <span>Subtotal</span><span>{(summary?.subtotal ?? subtotal()).toFixed(2)} MDL</span>
                 </div>
-                {regional && (
-                  <div className="flex justify-between text-gray-500">
-                    <span>Taxa</span><span>{regional.taxAmount.toFixed(2)} MDL</span>
+                {(summary?.discountAmount ?? 0) > 0 && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Discount ({form.couponCode})</span>
+                    <span>-{summary!.discountAmount.toFixed(2)} MDL</span>
                   </div>
                 )}
                 <div className="flex justify-between text-gray-500">
-                  <span>Livrare</span><span>{shippingCost} MDL</span>
+                  <span>Taxa ({summary ? ((summary.taxRate ?? 0) * 100).toFixed(0) : (regional ? (regional.taxRate * 100).toFixed(0) : '—')}%)</span>
+                  <span>{(summary?.taxAmount ?? regional?.taxAmount ?? 0).toFixed(2)} MDL</span>
+                </div>
+                <div className="flex justify-between text-gray-500">
+                  <span>Livrare</span><span>{(summary?.shippingCost ?? shippingCost).toFixed(2)} MDL</span>
                 </div>
                 <div className="flex justify-between font-bold text-base">
                   <span>Total</span>
-                  <span className="text-brand">{totalEstimate.toFixed(2)} MDL</span>
+                  <span className="text-brand">{(summary?.totalAmount ?? totalEstimate).toFixed(2)} MDL</span>
                 </div>
               </div>
               <textarea className="input w-full mt-2" rows={2} placeholder="Note optionale pentru livrare..."

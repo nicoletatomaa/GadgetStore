@@ -63,7 +63,7 @@ export default function AdminOrdersPage() {
         </div>
       ) : orders.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
-          <p className="text-5xl mb-3">рџ"‹</p>
+          <p className="text-5xl mb-3">📋</p>
           <p>Nu exista comenzi inca.</p>
         </div>
       ) : (
@@ -129,4 +129,3 @@ export default function AdminOrdersPage() {
     </div>
   )
 }
-

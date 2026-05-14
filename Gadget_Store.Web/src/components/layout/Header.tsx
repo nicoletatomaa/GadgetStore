@@ -28,7 +28,7 @@ function Logo() {
 export default function Header() {
   const navigate = useNavigate()
   const { user, isAuthenticated, clearAuth } = useAuthStore()
-  const { itemCount, toggleCart } = useCartStore()
+  const { itemCount } = useCartStore()
   const { searchQuery, setSearchQuery } = useUiStore()
 
   const handleLogout = async () => {
@@ -117,8 +117,8 @@ export default function Header() {
             )}
 
             {/* Cart */}
-            <button
-              onClick={toggleCart}
+            <Link
+              to="/cart"
               className="relative p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-300 hover:text-white"
               aria-label="Cos de cumparaturi"
             >
@@ -131,7 +131,7 @@ export default function Header() {
                   {count > 9 ? '9+' : count}
                 </span>
               )}
-            </button>
+            </Link>
           </div>
         </div>
       </div>

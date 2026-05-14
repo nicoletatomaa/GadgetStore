@@ -4,7 +4,7 @@ import { useAuthStore } from '@/store/authStore'
 // Layouts
 import MainLayout from '@/components/layout/MainLayout'
 
-// Pages вЂ" public
+// Pages - public
 import HomePage from '@/pages/HomePage'
 import CatalogPage from '@/pages/CatalogPage'
 import ProductPage from '@/pages/ProductPage'
@@ -12,7 +12,7 @@ import LoginPage from '@/pages/auth/LoginPage'
 import RegisterPage from '@/pages/auth/RegisterPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 
-// Pages вЂ" protected (require auth)
+// Pages - protected (require auth)
 import CartPage from '@/pages/CartPage'
 import CheckoutPage from '@/pages/checkout/CheckoutPage'
 import OrderConfirmPage from '@/pages/checkout/OrderConfirmPage'
@@ -21,13 +21,13 @@ import OrdersPage from '@/pages/account/OrdersPage'
 import OrderDetailPage from '@/pages/account/OrderDetailPage'
 import WishlistPage from '@/pages/account/WishlistPage'
 
-// Pages вЂ" admin only
+// Pages - admin only
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage'
 import AdminProductsPage from '@/pages/admin/AdminProductsPage'
 import AdminOrdersPage from '@/pages/admin/AdminOrdersPage'
 import AdminUsersPage from '@/pages/admin/AdminUsersPage'
 
-// в"Ђв"Ђв"Ђ Guard components в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
+// Guard components
 
 function RequireAuth() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -46,7 +46,7 @@ function GuestOnly() {
   return isAuthenticated ? <Navigate to="/" replace /> : <Outlet />
 }
 
-// в"Ђв"Ђв"Ђ Router в"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђв"Ђ
+// Router
 
 export const router = createBrowserRouter([
   {
@@ -99,4 +99,3 @@ export const router = createBrowserRouter([
     ],
   },
 ])
-

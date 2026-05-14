@@ -73,7 +73,7 @@ export default function AdminUsersPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
-          <p className="text-5xl mb-3">рџ'Ґ</p>
+          <p className="text-5xl mb-3">👥</p>
           <p>{search ? 'Nu s-au gasit utilizatori pentru aceasta cautare.' : 'Nu exista utilizatori.'}</p>
         </div>
       ) : (
@@ -98,7 +98,7 @@ export default function AdminUsersPage() {
                         {u.firstName?.[0]?.toUpperCase() ?? u.email[0].toUpperCase()}
                       </div>
                       <span className="font-medium text-gray-800">
-                        {u.firstName && u.lastName ? `${u.firstName} ${u.lastName}` : 'вЂ"'}
+                        {u.firstName && u.lastName ? `${u.firstName} ${u.lastName}` : '—'}
                       </span>
                     </div>
                   </td>
@@ -136,4 +136,3 @@ export default function AdminUsersPage() {
     </div>
   )
 }
-

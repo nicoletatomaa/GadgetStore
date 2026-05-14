@@ -1,6 +1,16 @@
 import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+
+function ProductImage({ imageUrl, type, name }: { imageUrl?: string; type: string; name: string }) {
+  const [broken, setBroken] = useState(false)
+  const fallback = type === 'Electronics' ? '📱' : '🎧'
+  if (imageUrl && !broken) {
+    return <img src={imageUrl} alt={name} className="w-full h-full object-contain p-6"
+      onError={() => setBroken(true)} />
+  }
+  return <span className="text-8xl">{fallback}</span>
+}
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { productsService, reviewsService, wishlistService } from '@/services/api'
 import { useAddToCart } from '@/hooks/useCart'
 import { useAuthStore } from '@/store/authStore'
@@ -17,7 +27,6 @@ type Tab = 'description' | 'reviews'
 
 export default function ProductPage() {
   const { id: productId = '' } = useParams<{ id: string }>()
-  const queryClient      = useQueryClient()
   const { isAuthenticated } = useAuthStore()
   const { addToast }     = useUiStore()
 
@@ -89,7 +98,7 @@ export default function ProductPage() {
 
   if (!product) return (
     <div className="text-center py-16 space-y-3">
-      <p className="text-5xl">вќ"</p>
+      <p className="text-5xl">❓</p>
       <p className="text-gray-500">Produsul nu a fost gasit.</p>
       <Link to="/catalog" className="btn-secondary inline-flex">Inapoi la catalog</Link>
     </div>
@@ -99,8 +108,8 @@ export default function ProductPage() {
     <div className="space-y-8">
       <div className="grid md:grid-cols-2 gap-8">
         {/* Imagine */}
-        <div className="bg-gray-100 rounded-2xl flex items-center justify-center text-8xl h-80">
-          {product.type === 'Electronics' ? '📱' : '🎧'}
+        <div className="bg-gray-100 rounded-2xl flex items-center justify-center h-80 overflow-hidden">
+          <ProductImage imageUrl={product.imageUrl} type={product.type} name={product.name} />
         </div>
 
         {/* Detalii */}
@@ -160,7 +169,7 @@ export default function ProductPage() {
           <div className="flex items-center gap-3">
             <label className="text-sm font-medium text-gray-700">Cantitate:</label>
             <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 py-1.5 hover:bg-gray-100 text-lg leading-none">в€'</button>
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 py-1.5 hover:bg-gray-100 text-lg leading-none">−</button>
               <span className="px-4 py-1.5 text-sm font-medium min-w-[2.5rem] text-center">{quantity}</span>
               <button onClick={() => setQuantity(Math.min(product.stock, quantity + 1))} className="px-3 py-1.5 hover:bg-gray-100 text-lg leading-none">+</button>
             </div>
@@ -283,4 +292,3 @@ export default function ProductPage() {
     </div>
   )
 }
-

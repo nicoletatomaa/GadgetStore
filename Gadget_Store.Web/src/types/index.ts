@@ -187,6 +187,7 @@ export interface CheckoutRequest {
   region: string
   couponCode?: string
   notes?: string
+  shippingCost?: number
 }
 
 export interface CheckoutSummary {

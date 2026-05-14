@@ -1,4 +1,4 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { productsService, catalogService } from '@/services/api'
 import { useUiStore } from '@/store/uiStore'
@@ -42,12 +42,16 @@ export default function AdminProductsPage() {
     queryFn:  () => productsService.getAll({ pageSize: 100 }),
   })
 
-  const { data: categories } = useQuery({
-    queryKey: ['catalog'],
-    queryFn:  () => catalogService.getTree(),
+  const { data: categories, isError: catsError } = useQuery({
+    queryKey: ['admin-categories'],
+    queryFn:  () => catalogService.getCategories(),
+    retry: 1,
   })
 
-  const flatCats = categories?.flatMap((c) => [c, ...(c.children ?? [])]) ?? []
+  const flatCats = categories?.flatMap((c) => [
+    { id: c.id, name: c.name },
+    ...(c.children ?? []).map((s) => ({ id: s.id, name: `  ${s.name}` })),
+  ]) ?? []
 
   const { mutate: saveProduct, isPending: saving } = useMutation({
     mutationFn: () => {
@@ -70,7 +74,7 @@ export default function AdminProductsPage() {
   })
 
   const { mutate: deleteProduct } = useMutation({
-    mutationFn: (id: number) => productsService.delete(id),
+    mutationFn: (id: string) => productsService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-products'] })
       addToast('Produs sters!', 'success')
@@ -105,7 +109,7 @@ export default function AdminProductsPage() {
     return p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q)
   }) ?? []
 
-  const formValid = form.name && form.price && form.stock && form.brand && form.categoryId
+  const formValid = form.name && form.price && form.stock && form.brand
 
   return (
     <div className="space-y-6">
@@ -184,7 +188,7 @@ export default function AdminProductsPage() {
           <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="p-6 border-b flex items-center justify-between">
               <h2 className="font-bold text-lg">{editing ? 'Editeaza produs' : 'Produs nou'}</h2>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-xl leading-none">вњ•</button>
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
             </div>
             <div className="p-6 space-y-4">
               <div>
@@ -193,7 +197,7 @@ export default function AdminProductsPage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">Pret (RON) *</label>
+                  <label className="block text-sm text-gray-600 mb-1">Pret (MDL) *</label>
                   <input type="number" className="input" placeholder="4999.99" value={form.price} onChange={set('price')} min={0} step={0.01} />
                 </div>
                 <div>
@@ -215,9 +219,12 @@ export default function AdminProductsPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Categorie *</label>
+                <label className="block text-sm text-gray-600 mb-1">Categorie</label>
+                {catsError ? (
+                  <p className="text-xs text-red-500 mb-1">Nu s-au putut incarca categoriile. Reporneste backend-ul.</p>
+                ) : null}
                 <select className="input" value={form.categoryId} onChange={set('categoryId')}>
-                  <option value="">Selecteaza categoria</option>
+                  <option value="">Fara categorie</option>
                   {flatCats.map((c) => (
                     <option key={c.id} value={c.id}>{c.name}</option>
                   ))}
@@ -271,4 +278,3 @@ export default function AdminProductsPage() {
     </div>
   )
 }
-
