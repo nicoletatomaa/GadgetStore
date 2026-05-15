@@ -4,14 +4,9 @@ import { api } from '@/services/api'
 import { useUiStore } from '@/store/uiStore'
 
 interface AdminUser {
-  id: string
-  email: string
-  role: 'Customer' | 'Admin'
-  firstName?: string
-  lastName?: string
-  phone?: string
-  isActive: boolean
-  createdAt: string
+  id: string; email: string; role: 'Customer' | 'Admin'
+  firstName?: string; lastName?: string; phone?: string
+  isActive: boolean; createdAt: string
 }
 
 function useAdminUsers() {
@@ -22,8 +17,8 @@ function useAdminUsers() {
 }
 
 export default function AdminUsersPage() {
-  const queryClient     = useQueryClient()
-  const { addToast }    = useUiStore()
+  const queryClient  = useQueryClient()
+  const { addToast } = useUiStore()
   const [search, setSearch] = useState('')
 
   const { data: users, isLoading } = useAdminUsers()
@@ -49,63 +44,57 @@ export default function AdminUsersPage() {
 
   return (
     <div className="space-y-6">
+
       <div className="flex items-center justify-between gap-4 flex-wrap">
-        <h1 className="text-2xl font-bold">Utilizatori</h1>
-        <div className="flex items-center gap-3">
-          <input
-            type="search"
-            placeholder="Cauta dupa email sau nume..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="input text-sm py-2 w-64"
-          />
-          <span className="text-sm text-gray-400">
-            {filtered.length} utilizatori
-          </span>
+        <div>
+          <h1 className="font-display text-2xl font-bold text-ink">Utilizatori</h1>
+          <p className="text-xs font-mono text-ink-faint mt-0.5">{filtered.length} CONTURI</p>
         </div>
+        <input type="search" placeholder="Cauta dupa email sau nume..."
+          value={search} onChange={(e) => setSearch(e.target.value)}
+          className="input text-sm py-2 w-64" />
       </div>
 
       {isLoading ? (
         <div className="space-y-2">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="card p-4 h-14 animate-pulse" />
-          ))}
+          {[1, 2, 3, 4, 5].map((i) => <div key={i} className="card h-14 animate-pulse" />)}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <p className="text-5xl mb-3">👥</p>
-          <p>{search ? 'Nu s-au gasit utilizatori pentru aceasta cautare.' : 'Nu exista utilizatori.'}</p>
+        <div className="text-center py-16 space-y-3">
+          <div className="text-4xl opacity-30">👥</div>
+          <p className="font-display text-xl font-bold text-ink">
+            {search ? 'Niciun utilizator gasit' : 'Nu exista utilizatori'}
+          </p>
         </div>
       ) : (
         <div className="card overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-gray-600 text-left">
+            <thead className="border-b border-edge bg-surface-raised">
               <tr>
-                <th className="px-4 py-3 font-medium">Utilizator</th>
-                <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Rol</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Inregistrat</th>
-                <th className="px-4 py-3 font-medium">Actiuni</th>
+                {['Utilizator', 'Email', 'Rol', 'Status', 'Inregistrat', 'Actiuni'].map((h) => (
+                  <th key={h} className="px-4 py-3 text-left text-xs font-mono text-ink-faint uppercase tracking-wider">{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-edge">
               {filtered.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={u.id} className="hover:bg-surface-raised transition-colors">
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-white text-xs font-bold shrink-0">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-brand flex items-center justify-center text-surface-base text-xs font-bold shrink-0">
                         {u.firstName?.[0]?.toUpperCase() ?? u.email[0].toUpperCase()}
                       </div>
-                      <span className="font-medium text-gray-800">
+                      <span className="font-semibold text-ink">
                         {u.firstName && u.lastName ? `${u.firstName} ${u.lastName}` : '—'}
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{u.email}</td>
+                  <td className="px-4 py-3 text-ink-muted font-mono text-xs">{u.email}</td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium
-                      ${u.role === 'Admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+                    <span className={`text-xs px-2 py-0.5 rounded font-mono font-semibold
+                      ${u.role === 'Admin'
+                        ? 'bg-brand-900 text-brand border border-brand/20'
+                        : 'bg-blue-950 text-blue-400 border border-blue-800/50'}`}>
                       {u.role}
                     </span>
                   </td>
@@ -114,15 +103,13 @@ export default function AdminUsersPage() {
                       {u.isActive ? 'Activ' : 'Inactiv'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-400 text-xs">
-                    {new Date(u.createdAt).toLocaleDateString('ro-RO')}
+                  <td className="px-4 py-3 text-ink-faint text-xs font-mono">
+                    {new Date(u.createdAt).toLocaleDateString('ro-MD')}
                   </td>
                   <td className="px-4 py-3">
-                    <select
-                      value={u.role}
+                    <select value={u.role}
                       onChange={(e) => changeRole({ id: u.id, role: e.target.value })}
-                      className="text-xs border border-gray-200 rounded px-2 py-1 bg-white cursor-pointer hover:border-brand"
-                    >
+                      className="text-xs bg-surface border border-edge rounded px-2 py-1 text-ink-muted cursor-pointer hover:border-brand transition-colors font-mono">
                       <option value="Customer">Customer</option>
                       <option value="Admin">Admin</option>
                     </select>
@@ -133,6 +120,7 @@ export default function AdminUsersPage() {
           </table>
         </div>
       )}
+
     </div>
   )
 }

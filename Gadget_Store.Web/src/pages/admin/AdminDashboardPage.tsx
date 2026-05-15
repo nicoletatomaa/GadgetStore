@@ -13,7 +13,7 @@ export default function AdminDashboardPage() {
     { label: 'Vanzari azi', value: `${stats.salesToday.toFixed(2)} MDL`, icon: '💰', color: 'text-green-600' },
     { label: 'Comenzi noi', value: stats.newOrders, icon: '📦', color: 'text-blue-600' },
     { label: 'Stoc critic', value: stats.criticalStock, icon: '⚠️', color: 'text-yellow-600' },
-    { label: 'Utilizatori noi', value: stats.newUsers, icon: '👤', color: 'text-purple-600' },
+    { label: 'Utilizatori noi', value: stats.newUsers, icon: '👤', color: 'text-brand' },
   ] : []
 
   return (
