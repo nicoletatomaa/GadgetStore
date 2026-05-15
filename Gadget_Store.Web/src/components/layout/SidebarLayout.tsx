@@ -1,13 +1,13 @@
-﻿import { Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 import Header from './Header'
 import Footer from './Footer'
 import ToastContainer from '@/components/ui/ToastContainer'
 
-export default function MainLayout() {
+export default function SidebarLayout() {
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#F7F4EF' }}>
       <Header />
-      <main className="flex-1 container mx-auto px-4 py-6 max-w-7xl">
+      <main className="flex-1 flex flex-col">
         <Outlet />
       </main>
       <Footer />
@@ -15,4 +15,3 @@ export default function MainLayout() {
     </div>
   )
 }
-

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { adminCategoriesService, catalogService } from '@/services/api'
+import { adminCategoriesService } from '@/services/api'
 import { useUiStore } from '@/store/uiStore'
 import { getCatSvgIcon } from '@/components/ui/CategorySidebar'
 
@@ -23,7 +23,7 @@ export default function AdminCategoriesPage() {
 
   const { data: categories, isLoading } = useQuery({
     queryKey: ['admin-categories'],
-    queryFn:  () => catalogService.getCategories(),
+    queryFn:  () => adminCategoriesService.getAll(),
   })
 
   /* flat display list: roots first, then indented children */
@@ -50,7 +50,7 @@ export default function AdminCategoriesPage() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-categories'] })
-      qc.invalidateQueries({ queryKey: ['catalog'] })
+      qc.invalidateQueries({ queryKey: ['catalog-nav'] })
       addToast(editingId ? 'Categorie actualizata!' : 'Categorie creata!', 'success')
       closeModal()
     },
@@ -61,7 +61,7 @@ export default function AdminCategoriesPage() {
     mutationFn: (id: number) => adminCategoriesService.delete(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-categories'] })
-      qc.invalidateQueries({ queryKey: ['catalog'] })
+      qc.invalidateQueries({ queryKey: ['catalog-nav'] })
       addToast('Categorie stearsa!', 'success')
       setConfirmDelete(null)
     },

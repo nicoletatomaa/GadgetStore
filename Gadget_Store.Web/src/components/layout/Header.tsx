@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+﻿import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useCartStore } from '@/store/cartStore'
 import { useUiStore } from '@/store/uiStore'
@@ -72,7 +72,7 @@ export default function Header() {
       style={{ background: '#0A0A0A', borderColor: 'rgba(255,255,255,0.06)' }}
     >
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className="flex items-center h-16 gap-4">
+        <div className="flex items-center h-20 gap-4">
           <Logo />
 
           {/* Search */}
@@ -112,13 +112,6 @@ export default function Header() {
 
           {/* Nav */}
           <nav className="hidden md:flex items-center gap-5">
-            <Link
-              to="/catalog"
-              className="text-white/45 hover:text-brand transition-colors"
-              style={navLabelStyle}
-            >
-              Catalog
-            </Link>
             {isAuthenticated && user?.role === 'Admin' && (
               <Link
                 to="/admin"
@@ -224,3 +217,4 @@ export default function Header() {
     </header>
   )
 }
+

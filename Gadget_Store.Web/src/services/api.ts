@@ -182,6 +182,24 @@ export const catalogService = {
        .then((r) => r.data),
 }
 
+// ─── Admin categories endpoints ───────────────────────────────────────────
+
+export const adminCategoriesService = {
+  getAll: () =>
+    api.get<{ id: number; name: string; description?: string; sortOrder: number; children: { id: number; name: string; sortOrder: number }[] }[]>(
+      '/api/admin/categories'
+    ).then((r) => toArray<{ id: number; name: string; description?: string; sortOrder: number; children: { id: number; name: string; sortOrder: number }[] }>(r.data)),
+
+  create: (data: { name: string; parentCategoryId?: number; description?: string; sortOrder?: number }) =>
+    api.post('/api/admin/categories', data).then((r) => r.data),
+
+  update: (id: number, data: { name: string; description?: string; sortOrder?: number }) =>
+    api.put(`/api/admin/categories/${id}`, data).then((r) => r.data),
+
+  delete: (id: number) =>
+    api.delete(`/api/admin/categories/${id}`).then((r) => r.data),
+}
+
 // ─── Cart endpoints ────────────────────────────────────────────────────────
 
 import type { Cart, AddToCartRequest, UpdateCartRequest } from '@/types'

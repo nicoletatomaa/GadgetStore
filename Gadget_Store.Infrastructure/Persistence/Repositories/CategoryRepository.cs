@@ -36,4 +36,12 @@ public class CategoryRepository : BaseRepository<Category>, ICategoryRepository
             .Where(c => c.ParentCategoryId == parentId && c.IsActive)
             .OrderBy(c => c.SortOrder)
             .ToListAsync();
+
+    public async Task DeleteAsync(int id)
+    {
+        var category = await Context.Categories.FindAsync(id);
+        if (category is null) return;
+        Context.Categories.Remove(category);
+        await Context.SaveChangesAsync();
+    }
 }

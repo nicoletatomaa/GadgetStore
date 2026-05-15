@@ -3,6 +3,7 @@ import { useAuthStore } from '@/store/authStore'
 
 // Layouts
 import MainLayout from '@/components/layout/MainLayout'
+import SidebarLayout from '@/components/layout/SidebarLayout'
 
 // Pages - public
 import HomePage from '@/pages/HomePage'
@@ -26,6 +27,7 @@ import AdminDashboardPage from '@/pages/admin/AdminDashboardPage'
 import AdminProductsPage from '@/pages/admin/AdminProductsPage'
 import AdminOrdersPage from '@/pages/admin/AdminOrdersPage'
 import AdminUsersPage from '@/pages/admin/AdminUsersPage'
+import AdminCategoriesPage from '@/pages/admin/AdminCategoriesPage'
 
 // Guard components
 
@@ -51,51 +53,63 @@ function GuestOnly() {
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <MainLayout />,
     children: [
-      // Public routes
-      { index: true, element: <HomePage /> },
-      { path: 'catalog', element: <CatalogPage /> },
-      { path: 'catalog/:categoryId', element: <CatalogPage /> },
-      { path: 'products/:id', element: <ProductPage /> },
-
-      // Guest-only routes (redirecteaza autentificatii)
+      // ── Full-width layout for pages with sidebar ───────────────────
       {
-        element: <GuestOnly />,
+        element: <SidebarLayout />,
         children: [
-          { path: 'login', element: <LoginPage /> },
-          { path: 'register', element: <RegisterPage /> },
+          { index: true, element: <HomePage /> },
+          { path: 'catalog', element: <CatalogPage /> },
+          { path: 'catalog/:categoryId', element: <CatalogPage /> },
         ],
       },
 
-      // Protected routes
+      // ── Container layout for all other pages ───────────────────────
       {
-        element: <RequireAuth />,
+        element: <MainLayout />,
         children: [
-          { path: 'cart', element: <CartPage /> },
-          { path: 'checkout', element: <CheckoutPage /> },
-          { path: 'checkout/confirm/:orderId', element: <OrderConfirmPage /> },
-          { path: 'account/profile', element: <ProfilePage /> },
-          { path: 'account/orders', element: <OrdersPage /> },
-          { path: 'account/orders/:id', element: <OrderDetailPage /> },
-          { path: 'account/wishlist', element: <WishlistPage /> },
+          { path: 'products/:id', element: <ProductPage /> },
+
+          // Guest-only routes
+          {
+            element: <GuestOnly />,
+            children: [
+              { path: 'login', element: <LoginPage /> },
+              { path: 'register', element: <RegisterPage /> },
+            ],
+          },
+
+          // Protected routes
+          {
+            element: <RequireAuth />,
+            children: [
+              { path: 'cart', element: <CartPage /> },
+              { path: 'checkout', element: <CheckoutPage /> },
+              { path: 'checkout/confirm/:orderId', element: <OrderConfirmPage /> },
+              { path: 'account/profile', element: <ProfilePage /> },
+              { path: 'account/orders', element: <OrdersPage /> },
+              { path: 'account/orders/:id', element: <OrderDetailPage /> },
+              { path: 'account/wishlist', element: <WishlistPage /> },
+            ],
+          },
+
+          // Admin routes
+          {
+            path: 'admin',
+            element: <RequireAdmin />,
+            children: [
+              { index: true, element: <AdminDashboardPage /> },
+              { path: 'products', element: <AdminProductsPage /> },
+              { path: 'orders', element: <AdminOrdersPage /> },
+              { path: 'users', element: <AdminUsersPage /> },
+              { path: 'categories', element: <AdminCategoriesPage /> },
+            ],
+          },
+
+          // 404
+          { path: '*', element: <NotFoundPage /> },
         ],
       },
-
-      // Admin routes
-      {
-        path: 'admin',
-        element: <RequireAdmin />,
-        children: [
-          { index: true, element: <AdminDashboardPage /> },
-          { path: 'products', element: <AdminProductsPage /> },
-          { path: 'orders', element: <AdminOrdersPage /> },
-          { path: 'users', element: <AdminUsersPage /> },
-        ],
-      },
-
-      // 404
-      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])

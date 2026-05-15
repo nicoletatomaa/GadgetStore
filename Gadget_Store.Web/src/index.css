@@ -9,10 +9,10 @@
 
   body {
     background-color: #F7F4EF;
-    color: #3D3B36;
+    color: #2A2824;
     font-family: 'Barlow', system-ui, sans-serif;
-    font-size: 15px;
-    line-height: 1.6;
+    font-size: 16px;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -150,20 +150,39 @@
   .badge {
     display: inline-flex;
     align-items: center;
-    padding: 2px 7px;
-    border-radius: 2px;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 999px;
     font-family: 'Barlow Condensed', system-ui, sans-serif;
     font-size: 0.68rem;
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.07em;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
-  .badge-green  { @apply badge; background: #D1FAE5; color: #065F46; }
-  .badge-red    { @apply badge; background: #FEE2E2; color: #991B1B; }
-  .badge-yellow { @apply badge; background: #FEF3C7; color: #92400E; }
-  .badge-blue   { @apply badge; background: #E0F2FE; color: #075985; }
-  .badge-gray   { @apply badge; background: #EDE8E0; color: #6B6358; }
+  /* Dot indicator on all badge variants */
+  .badge::before,
+  .badge-green::before,
+  .badge-red::before,
+  .badge-yellow::before,
+  .badge-blue::before,
+  .badge-gray::before {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.8;
+    flex-shrink: 0;
+  }
+
+  .badge-green  { @apply badge; color: #059669; background: rgba(5,150,105,0.1); border: 1px solid rgba(5,150,105,0.22); }
+  .badge-red    { @apply badge; color: #DC2626; background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.22); }
+  .badge-yellow { @apply badge; color: #D97706; background: rgba(217,119,6,0.1); border: 1px solid rgba(217,119,6,0.22); }
+  .badge-blue   { @apply badge; color: #2563EB; background: rgba(37,99,235,0.1); border: 1px solid rgba(37,99,235,0.22); }
+  .badge-gray   { @apply badge; color: #6B6358; background: rgba(107,99,88,0.1); border: 1px solid rgba(107,99,88,0.22); }
 
   /* Hero keeps dark bg; hero-gradient is now just the black surface */
   .hero-gradient {

@@ -1,6 +1,7 @@
 using GadgetStore.API.DTOs;
 using GadgetStore.Application.Interfaces;
 using GadgetStore.Domain.Entities;
+using GadgetStore.Patterns.Behavioral.Observer;
 using GadgetStore.Patterns.Creational.Prototype;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,13 +12,21 @@ namespace GadgetStore.API.Controllers;
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
-    private readonly IProductRepository      _products;
-    private readonly ProductTemplateRegistry _registry;
+    private readonly IProductRepository          _products;
+    private readonly ProductTemplateRegistry     _registry;
+    private readonly WishlistNotificationObserver _wishlistObserver;
+    private readonly PriceDropObserver           _priceDropObserver;
 
-    public ProductsController(IProductRepository products, ProductTemplateRegistry registry)
+    public ProductsController(
+        IProductRepository           products,
+        ProductTemplateRegistry      registry,
+        WishlistNotificationObserver wishlistObserver,
+        PriceDropObserver            priceDropObserver)
     {
-        _products = products;
-        _registry = registry;
+        _products          = products;
+        _registry          = registry;
+        _wishlistObserver  = wishlistObserver;
+        _priceDropObserver = priceDropObserver;
     }
 
     // ── GET /api/products ──────────────────────────────────────────────────────
@@ -162,8 +171,9 @@ public class ProductsController : ControllerBase
 
     // ── PATCH /api/products/{id}/stock — Observer pattern ─────────────────────
     /// <summary>
-    /// Actualizeaza stocul si notifica observatorii (EmailAlert, WishlistNotification).
-    /// Pattern: Observer — Product notifica automat abonamentii la modificare stoc.
+    /// Actualizeaza stocul si notifica observatorii subscriși.
+    /// Pattern: Observer — WishlistNotificationObserver + LowStockLogObserver sunt
+    /// subscriși la produs înainte de UpdateStock(); notificarea e automată.
     /// </summary>
     [HttpPatch("{id:guid}/stock")]
     [Authorize(Roles = "Admin")]
@@ -172,16 +182,29 @@ public class ProductsController : ControllerBase
         var product = await _products.GetByIdAsync(id);
         if (product is null) return NotFound(new { message = "Produsul nu a fost gasit." });
 
-        product.UpdateStock(req.NewStock);
+        // Observer pattern — subscribe înainte de modificare
+        var lowStockObserver = new LowStockLogObserver();
+        product.Subscribe(_wishlistObserver);
+        product.Subscribe(lowStockObserver);
+
+        product.UpdateStock(req.NewStock);   // notifică automat observatorii
         await _products.UpdateAsync(product);
 
-        return Ok(new { product.Id, product.Name, product.Stock });
+        return Ok(new
+        {
+            product.Id,
+            product.Name,
+            product.Stock,
+            LowStockLog       = lowStockObserver.Log,
+            ObserversNotified = 2,
+        });
     }
 
     // ── PATCH /api/products/{id}/price — Observer pattern ─────────────────────
     /// <summary>
-    /// Actualizeaza pretul si notifica observatorii (PriceDropObserver).
-    /// Pattern: Observer — Product notifica automat abonamentii la modificare pret.
+    /// Actualizeaza pretul si notifica observatorii subscriși.
+    /// Pattern: Observer — PriceDropObserver e subscris la produs înainte de
+    /// UpdatePrice(); utilizatorii din wishlist sunt notificați automat.
     /// </summary>
     [HttpPatch("{id:guid}/price")]
     [Authorize(Roles = "Admin")]
@@ -190,10 +213,19 @@ public class ProductsController : ControllerBase
         var product = await _products.GetByIdAsync(id);
         if (product is null) return NotFound(new { message = "Produsul nu a fost gasit." });
 
-        product.UpdatePrice(req.NewPrice);
+        // Observer pattern — subscribe înainte de modificare
+        product.Subscribe(_priceDropObserver);
+
+        product.UpdatePrice(req.NewPrice);   // notifică automat observatorii
         await _products.UpdateAsync(product);
 
-        return Ok(new { product.Id, product.Name, product.Price });
+        return Ok(new
+        {
+            product.Id,
+            product.Name,
+            product.Price,
+            ObserversNotified = 1,
+        });
     }
 
     // ── GET /api/products/templates — Prototype pattern ───────────────────────

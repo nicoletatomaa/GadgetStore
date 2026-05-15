@@ -29,6 +29,12 @@ export default {
           warm:    '#EDE8E0',
           border:  '#E8E3D8',
         },
+        /* Tokeni folositi de admin pages si CategorySidebar */
+        surface: {
+          DEFAULT: '#FFFFFF',
+          raised:  '#F7F4EF',
+        },
+        edge: '#E8E3D8',
       },
       fontFamily: {
         sans:    ['Barlow', 'system-ui', 'sans-serif'],

@@ -10,4 +10,5 @@ public interface ICategoryRepository
     Task<IEnumerable<Category>> GetSubCategoriesAsync(int parentId);
     Task AddAsync(Category category);
     Task UpdateAsync(Category category);
+    Task DeleteAsync(int id);
 }
